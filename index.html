@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Ramesh Photography | Event Photos</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top"><a class="brand" href="./">RAMESH <span>PHOTOGRAPHY</span></a><a class="admin-link" href="admin.html">Admin</a></header>
+  <main class="hero">
+    <div class="eyebrow">YOUR MOMENTS • YOUR MEMORIES</div>
+    <h1>Every beautiful moment,<br><em>all in one place.</em></h1>
+    <p>Scan the event QR code to view and download your photographs.</p>
+    <section class="event-box">
+      <h2>Open your event gallery</h2>
+      <form id="eventForm">
+        <label for="eventCode">Event code</label>
+        <div class="form-row"><input id="eventCode" placeholder="Enter event code" required><button>View photos</button></div>
+      </form>
+      <small>For the event code, please contact the photographer.</small>
+      <div id="message" role="status"></div>
+    </section>
+  </main>
+  <footer>© <span id="year"></span> Ramesh Photography</footer>
+  <script src="app.js"></script>
+</body></html>
