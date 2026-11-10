@@ -58,13 +58,25 @@ async function uploadOne(file,eventId,albumId,progress){
   const resourceType=file.type.startsWith("video/")?"video":"image";
   const signed=await api("/api/admin/uploads/sign",{method:"POST",body:JSON.stringify({eventId,resourceType,fileName:file.name,contentType:file.type,fileSize:file.size})});
   const formData=new FormData();formData.append("file",file);formData.append("api_key",signed.apiKey);formData.append("timestamp",String(signed.timestamp));
-  formData.append("folder",signed.folder);formData.append("upload_preset",signed.uploadPreset);formData.append("signature",signed.signature);
+  formData.append("folder",signed.folder);if(signed.uploadPreset)formData.append("upload_preset",signed.uploadPreset);formData.append("signature",signed.signature);
   const uploaded=await new Promise((resolve,reject)=>{
-    const xhr=new XMLHttpRequest();xhr.open("POST",signed.uploadUrl);
+    const xhr=new XMLHttpRequest();xhr.open("POST",signed.uploadUrl);xhr.timeout=180000;
     xhr.upload.onprogress=event=>{if(event.lengthComputable)progress(Math.round(event.loaded/event.total*100));};
-    xhr.onload=()=>{let result={};try{result=JSON.parse(xhr.responseText);}catch{}if(xhr.status>=200&&xhr.status<300)resolve(result);else reject(new Error(result.error?.message||"Cloudinary upload failed."));};
-    xhr.onerror=()=>reject(new Error("Network error during upload."));xhr.send(formData);
+    xhr.onload=()=>{
+      let result={};try{result=JSON.parse(xhr.responseText);}catch{}
+      if(xhr.status>=200&&xhr.status<300&&result.public_id&&result.secure_url)resolve(result);
+      else {
+        const headerError=xhr.getResponseHeader("X-Cld-Error");
+        const detail=result.error?.message||headerError||("Cloudinary returned HTTP "+xhr.status+".");
+        reject(new Error(detail));
+      }
+    };
+    xhr.onerror=()=>reject(new Error("Network/CORS error connecting to Cloudinary. Check browser internet connection and Cloudinary upload endpoint."));
+    xhr.ontimeout=()=>reject(new Error("Upload timed out after 3 minutes. Try one smaller JPG file."));
+    xhr.onabort=()=>reject(new Error("Upload was cancelled."));
+    xhr.send(formData);
   });
+  progress(100);
   await api("/api/admin/media",{method:"POST",body:JSON.stringify({eventId,albumId:albumId||null,publicId:uploaded.public_id,secureUrl:uploaded.secure_url,fileName:file.name,contentType:file.type,fileSize:file.size,resourceType:uploaded.resource_type||resourceType,width:uploaded.width,height:uploaded.height,format:uploaded.format,duration:uploaded.duration})});
 }
 $("bootstrapForm").addEventListener("submit",async event=>{
@@ -99,12 +111,25 @@ $("uploadEvent").addEventListener("change",event=>loadAlbums(Number(event.target
 $("uploadForm").addEventListener("submit",async event=>{
   event.preventDefault();const files=Array.from($("mediaFiles").files||[]),eventId=Number($("uploadEvent").value),albumId=$("uploadAlbum").value?Number($("uploadAlbum").value):null;
   if(!files.length||!eventId)return say("Choose an event and at least one file.",true);
-  const progress=$("uploadProgress");let complete=0;
+  const progress=$("uploadProgress");progress.value=0;let complete=0,failed=0;
   for(const file of files){
-    try{say("Uploading "+file.name+"…");await uploadOne(file,eventId,albumId,percent=>{progress.value=Math.round((complete+percent/100)/files.length*100);});complete++;progress.value=Math.round(complete/files.length*100);}
-    catch(err){say(file.name+": "+err.message,true);}
+    try{
+      say("Preparing secure upload for "+file.name+"…");
+      await uploadOne(file,eventId,albumId,percent=>{
+        progress.value=Math.round((complete+percent/100)/files.length*100);
+        say("Uploading "+file.name+"… "+percent+"%");
+      });
+      complete++;
+      progress.value=Math.round(complete/files.length*100);
+      say("Saved "+file.name+" to the event gallery.");
+    }catch(err){
+      failed++;
+      say(file.name+": "+err.message,true);
+    }
   }
-  say("Upload finished: "+complete+" of "+files.length+" file(s) saved.");await loadMedia(eventId);await loadEvents();$("mediaFiles").value="";
+  if(failed===0)say("Upload finished: "+complete+" of "+files.length+" file(s) saved.");
+  else say("Upload finished with "+complete+" saved and "+failed+" failed. Read the error above.",true);
+  await loadMedia(eventId);await loadEvents();$("mediaFiles").value="";
 });
 $("albumForm").addEventListener("submit",async event=>{
   event.preventDefault();if(!selectedEvent)return say("Choose an event first.",true);
