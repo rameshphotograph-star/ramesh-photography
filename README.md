@@ -23,7 +23,18 @@ Set in Pages → Settings → Variables and secrets → Production:
 - CLOUDINARY_UPLOAD_PRESET (Text; value ramesh_photography; if omitted the app defaults to this preset)
 - ADMIN_BOOTSTRAP_KEY (Secret; generate and retain a long random value)
 
-Keep the existing D1 binding named DB. Do not put secrets in GitHub files, browser JavaScript, HTML or README.
+Keep the existing Production D1 binding named DB. Do not put secrets in GitHub files, browser JavaScript, HTML or README.
+
+## Required Cloudflare Preview variables/secrets
+Set these separately in Pages → Settings → Preview → Variables and secrets:
+- CLOUDINARY_CLOUD_NAME (Text)
+- CLOUDINARY_API_KEY (Text)
+- CLOUDINARY_API_SECRET (Secret)
+- ADMIN_BOOTSTRAP_KEY (Secret; use a new random 32-byte value, different from any Production bootstrap key)
+- CLOUDINARY_FOLDER_PREFIX (Text; set to ramesh-photography-preview so test uploads stay in a separate Cloudinary folder)
+- CLOUDINARY_UPLOAD_PRESET is optional; if omitted the app defaults to ramesh_photography.
+
+Use the same Cloudinary account credentials only if you intend to store Preview test files in that Cloudinary account. Preview uploads will be written under ramesh-photography-preview/<event-code>, separated from the Production ramesh-photography/<event-code> folders.
 
 ## Database support tables
 The admin bootstrap, login and authenticated admin-session paths safely ensure the two support tables with CREATE TABLE IF NOT EXISTS when needed:
