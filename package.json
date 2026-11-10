@@ -3,6 +3,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check": "find functions -type f -name '*.js' -print0 | xargs -0 -n1 node --check && node --check app.js && node --check admin.js"
+    "check": "find functions -type f -name '*.js' -print0 | xargs -0 -n1 node --check && node --check app.js && node --check admin.js && node --check diagnostics.js"
   }
 }
