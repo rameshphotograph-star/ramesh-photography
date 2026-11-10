@@ -1,0 +1,26 @@
+name: Validate Pages Functions
+on:
+  pull_request:
+  push:
+    branches:
+      - feature/photo-delivery-platform
+jobs:
+  syntax-and-migration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check JavaScript syntax
+        run: npm run check
+      - name: Validate additive D1 migration syntax
+        run: |
+          python - <<'PY'
+          import sqlite3
+          from pathlib import Path
+          db = sqlite3.connect(":memory:")
+          db.execute("CREATE TABLE photos (id INTEGER PRIMARY KEY)")
+          db.executescript(Path("migrations/0002_platform_support.sql").read_text())
+          print("Migration parsed and applied against a minimal photos-table fixture.")
+          PY
