@@ -15,12 +15,14 @@ export async function onRequestPost({ request, env }) {
     const email = text(input.email, 190).toLowerCase(), password = typeof input.password === "string" ? input.password : "";
     if (!env.ADMIN_BOOTSTRAP_KEY) return error("ADMIN_BOOTSTRAP_KEY is not configured in Cloudflare Pages secrets.", 503);
     if (!constantTimeTextEqual(bootstrapKey, env.ADMIN_BOOTSTRAP_KEY)) return error("Invalid bootstrap key.", 403);
+
+    // A valid bootstrap key may safely ensure the two additive support tables,
+    // even when an admin account was created earlier.
+    await ensureSupportTables(db);
+
     const count = await db.prepare("SELECT COUNT(*) AS total FROM admins").first();
     if (Number(count?.total || 0) > 0) return error("Initial admin setup is already locked. Use admin login.", 409);
     if (!name || !validEmail(email) || password.length < 12) return error("Enter a name, valid email and password with at least 12 characters.");
-    // Add only the two support tables required by this application.
-    // IF NOT EXISTS makes this safe if the documented migration was already run.
-    await ensureSupportTables(db);
     const passwordHash = await hashPassword(password);
     const result = await db.prepare("INSERT INTO admins (name,email,password_hash,is_active) SELECT ?,?,?,1 WHERE NOT EXISTS (SELECT 1 FROM admins)")
       .bind(name, email, passwordHash).run();
