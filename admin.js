@@ -35,6 +35,7 @@ async function loadAlbums(eventId){
 async function selectEvent(id){
   selectedEvent=events.find(event=>Number(event.id)===Number(id));if(!selectedEvent)return;
   $("eventTools").hidden=false;$("selectedEventName").textContent=selectedEvent.event_name;$("selectedEventCode").textContent="Event code: "+selectedEvent.event_code;
+  $("editEventName").value=selectedEvent.event_name||"";$("editEventDate").value=selectedEvent.event_date||"";$("editEventVenue").value=selectedEvent.venue||"";
   const url=new URL(location.origin+"/");url.searchParams.set("event",selectedEvent.event_code);$("guestLink").href=url.href;
   $("qrCode").replaceChildren();
   if(window.QRCode)new QRCode($("qrCode"),{text:url.href,width:220,height:220,correctLevel:QRCode.CorrectLevel.H});
@@ -87,6 +88,13 @@ $("eventCreateForm").addEventListener("submit",async event=>{
     say("Event created. Code: "+data.event.eventCode);event.target.reset();await loadEvents();const created=events.find(item=>item.event_code===data.event.eventCode);if(created)await selectEvent(created.id);
   }catch(err){say(err.message,true);}
 });
+$("eventEditForm").addEventListener("submit",async event=>{
+  event.preventDefault();if(!selectedEvent)return say("Choose an event first.",true);
+  try{
+    await api("/api/admin/events/"+selectedEvent.id,{method:"PATCH",body:JSON.stringify({eventName:$("editEventName").value,eventDate:$("editEventDate").value,venue:$("editEventVenue").value})});
+    say("Event details updated.");await loadEvents();await selectEvent(selectedEvent.id);
+  }catch(err){say(err.message,true);}
+});
 $("uploadEvent").addEventListener("change",event=>loadAlbums(Number(event.target.value)));
 $("uploadForm").addEventListener("submit",async event=>{
   event.preventDefault();const files=Array.from($("mediaFiles").files||[]),eventId=Number($("uploadEvent").value),albumId=$("uploadAlbum").value?Number($("uploadAlbum").value):null;
@@ -112,5 +120,15 @@ $("downloadQr").addEventListener("click",()=>{
   const canvas=$("qrCode").querySelector("canvas"),image=$("qrCode").querySelector("img"),url=canvas?canvas.toDataURL("image/png"):image?.src;
   if(!url)return say("QR code is not ready.",true);
   const link=document.createElement("a");link.href=url;link.download=(selectedEvent?.event_code||"event")+"-QR.png";link.click();
+});
+$("printQr").addEventListener("click",()=>{
+  const canvas=$("qrCode").querySelector("canvas"),image=$("qrCode").querySelector("img"),src=canvas?canvas.toDataURL("image/png"):image?.src;
+  if(!src||!selectedEvent)return say("QR code is not ready.",true);
+  const win=window.open("","_blank","noopener,noreferrer,width=600,height=750");
+  if(!win)return say("Allow pop-ups to print the QR card.",true);
+  const title=selectedEvent.event_name.replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+  const code=selectedEvent.event_code;
+  win.document.write("<!doctype html><html><head><title>Event QR</title><style>body{font-family:Arial,sans-serif;text-align:center;padding:48px;color:#172033}h1{font-family:Georgia,serif;font-weight:400}img{width:300px;height:300px;object-fit:contain;margin:30px auto}p{color:#687386;letter-spacing:2px}@media print{button{display:none}}</style></head><body><p>RAMESH PHOTOGRAPHY</p><h1>"+title+"</h1><img src='"+src+"' alt='Event QR code'><h2>"+code+"</h2><p>SCAN TO VIEW & DOWNLOAD PHOTOS</p><button onclick='window.print()'>Print</button></body></html>");
+  win.document.close();
 });
 initialize();
