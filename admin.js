@@ -108,10 +108,15 @@ $("eventEditForm").addEventListener("submit",async event=>{
   }catch(err){say(err.message,true);}
 });
 $("uploadEvent").addEventListener("change",event=>loadAlbums(Number(event.target.value)));
+$("mediaFiles").addEventListener("change",event=>{
+  const files=Array.from(event.target.files||[]);
+  if(files.length)say("Selected "+files.length+" file(s): "+files.map(file=>file.name).join(", "));
+  else say("No files selected.");
+});
 $("uploadForm").addEventListener("submit",async event=>{
   event.preventDefault();const files=Array.from($("mediaFiles").files||[]),eventId=Number($("uploadEvent").value),albumId=$("uploadAlbum").value?Number($("uploadAlbum").value):null;
   if(!files.length||!eventId)return say("Choose an event and at least one file.",true);
-  const progress=$("uploadProgress");progress.value=0;let complete=0,failed=0;
+  const progress=$("uploadProgress");progress.value=0;let complete=0,failed=0,lastError="";
   for(const file of files){
     try{
       say("Preparing secure upload for "+file.name+"…");
@@ -124,11 +129,12 @@ $("uploadForm").addEventListener("submit",async event=>{
       say("Saved "+file.name+" to the event gallery.");
     }catch(err){
       failed++;
-      say(file.name+": "+err.message,true);
+      lastError=file.name+": "+err.message;
+      say(lastError,true);
     }
   }
   if(failed===0)say("Upload finished: "+complete+" of "+files.length+" file(s) saved.");
-  else say("Upload finished with "+complete+" saved and "+failed+" failed. Read the error above.",true);
+  else say("Upload finished with "+complete+" saved and "+failed+" failed. "+lastError,true);
   await loadMedia(eventId);await loadEvents();$("mediaFiles").value="";
 });
 $("albumForm").addEventListener("submit",async event=>{
