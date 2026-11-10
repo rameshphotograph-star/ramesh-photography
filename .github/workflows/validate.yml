@@ -14,13 +14,30 @@ jobs:
           node-version: 22
       - name: Check JavaScript syntax
         run: npm run check
-      - name: Validate additive D1 migration syntax
+      - name: Validate Pages routes configuration
+        run: python -m json.tool _routes.json >/dev/null
+      - name: Validate additive D1 migration against existing schema
         run: |
           python - <<'PY'
           import sqlite3
           from pathlib import Path
           db = sqlite3.connect(":memory:")
-          db.execute("CREATE TABLE photos (id INTEGER PRIMARY KEY)")
+          db.executescript("""
+          PRAGMA foreign_keys=ON;
+          CREATE TABLE admins (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL, is_active INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+          CREATE TABLE events (id INTEGER PRIMARY KEY AUTOINCREMENT, event_name TEXT NOT NULL, event_type TEXT NOT NULL DEFAULT 'wedding', event_date TEXT, venue TEXT, event_code TEXT NOT NULL UNIQUE, status TEXT NOT NULL DEFAULT 'active', admin_id INTEGER NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(admin_id) REFERENCES admins(id));
+          CREATE TABLE albums (id INTEGER PRIMARY KEY AUTOINCREMENT, event_id INTEGER NOT NULL, album_name TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(event_id) REFERENCES events(id));
+          CREATE TABLE photos (id INTEGER PRIMARY KEY AUTOINCREMENT, event_id INTEGER NOT NULL, album_id INTEGER, object_key TEXT NOT NULL UNIQUE, file_name TEXT NOT NULL, content_type TEXT, file_size INTEGER, uploaded_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(event_id) REFERENCES events(id), FOREIGN KEY(album_id) REFERENCES albums(id));
+          CREATE TABLE admin_sessions (id INTEGER PRIMARY KEY AUTOINCREMENT, admin_id INTEGER NOT NULL, token_hash TEXT NOT NULL UNIQUE, expires_at TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(admin_id) REFERENCES admins(id));
+          CREATE TABLE guest_sessions (id INTEGER PRIMARY KEY AUTOINCREMENT, event_id INTEGER NOT NULL, token_hash TEXT NOT NULL UNIQUE, expires_at TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(event_id) REFERENCES events(id));
+          """)
           db.executescript(Path("migrations/0002_platform_support.sql").read_text())
-          print("Migration parsed and applied against a minimal photos-table fixture.")
+          expected = {"admins","events","albums","photos","admin_sessions","guest_sessions","login_attempts","photo_delivery_meta"}
+          actual = {row[0] for row in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+          assert expected.issubset(actual), (expected - actual)
+          db.execute("INSERT INTO admins(name,email,password_hash) VALUES('Test','test@example.com','hash')")
+          db.execute("INSERT INTO events(event_name,event_code,admin_id) VALUES('Test Wedding','WED-TEST1',1)")
+          db.execute("INSERT INTO photos(event_id,object_key,file_name) VALUES(1,'public-id','test.jpg')")
+          db.execute("INSERT INTO photo_delivery_meta(photo_id,secure_url) VALUES(1,'https://res.cloudinary.com/demo/image/upload/test.jpg')")
+          print("Migration and expected D1 relationships validated.")
           PY
