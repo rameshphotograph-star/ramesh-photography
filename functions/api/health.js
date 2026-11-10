@@ -15,6 +15,7 @@ export async function onRequestGet({ env }) {
     schemaReady: false,
     cloudinaryConfigured: false,
     adminBootstrapConfigured: false,
+    previewFolderIsolated: false,
     missingTables: [],
     missingColumns: {}
   };
@@ -40,6 +41,7 @@ export async function onRequestGet({ env }) {
 
   result.cloudinaryConfigured = Boolean(env.CLOUDINARY_CLOUD_NAME && env.CLOUDINARY_API_KEY && env.CLOUDINARY_API_SECRET);
   result.adminBootstrapConfigured = Boolean(env.ADMIN_BOOTSTRAP_KEY);
+  result.previewFolderIsolated = String(env.CLOUDINARY_FOLDER_PREFIX || "").startsWith("ramesh-photography-preview");
   return new Response(JSON.stringify(result), {
     status: result.database && result.schemaReady ? 200 : 503,
     headers: {
