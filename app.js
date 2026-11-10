@@ -23,6 +23,9 @@ function setMessage(node, value, isError = false) {
 function thumbnailUrl(url) {
   return url.replace("/upload/", "/upload/f_auto,q_auto,w_700,c_limit/");
 }
+function downloadUrl(url) {
+  return safeText(url).replace("/upload/", "/upload/fl_attachment/");
+}
 function mediaElement(photo, large = false) {
   const url = safeText(photo.secure_url);
   const type = photo.resource_type === "video" ? "video" : "image";
@@ -51,7 +54,7 @@ function openPhoto(photo) {
   if (media.tagName === "IMG") media.classList.add("dialog-image");
   target.append(media);
   const link = document.getElementById("downloadPhoto");
-  link.href = photo.secure_url;
+  link.href = downloadUrl(photo.secure_url);
   link.download = photo.file_name || "ramesh-photography";
   photoDialog.showModal();
 }
@@ -166,12 +169,12 @@ photoDialog.addEventListener("click", event => {
   if (event.target === photoDialog) photoDialog.close();
 });
 document.getElementById("downloadAll").addEventListener("click", async () => {
-  const photos = currentPhotos.filter(photo => photo.resource_type === "image" && photo.secure_url);
+  const photos = currentPhotos.filter(photo => (photo.resource_type === "image" || photo.resource_type === "video") && photo.secure_url);
   if (!photos.length) return setMessage(galleryMessage, "No loaded photos to download.");
   setMessage(galleryMessage, "Preparing " + photos.length + " loaded photo download(s)…");
   for (const photo of photos) {
     const link = document.createElement("a");
-    link.href = photo.secure_url;
+    link.href = downloadUrl(photo.secure_url);
     link.download = photo.file_name || "photo";
     link.target = "_blank";
     link.rel = "noopener";
