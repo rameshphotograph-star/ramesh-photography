@@ -1,5 +1,8 @@
 const encoder = new TextEncoder();
-const ITERATIONS = 310000;
+// Cloudflare Workers rejects a single Web Crypto PBKDF2 operation above 100,000 iterations.
+// This lower-cost setting is a Preview compatibility measure only; use a stronger
+// Workers-compatible password KDF (for example Argon2id) before Production launch.
+const ITERATIONS = 100000;
 function toBase64(bytes) { let binary = ""; for (const byte of bytes) binary += String.fromCharCode(byte); return btoa(binary); }
 function fromBase64(value) { const binary = atob(value); return Uint8Array.from(binary, char => char.charCodeAt(0)); }
 export function randomToken(bytes = 32) {
