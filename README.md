@@ -5,7 +5,7 @@ This feature branch upgrades the original static starter into a D1-backed event 
 ## Existing infrastructure expected
 - Cloudflare Pages project: ramesh-photography
 - D1 binding: DB → ramesh-photo-db
-- Cloudinary upload preset: ramesh_photography (signed mode)
+- Cloudinary upload preset: optional; signed direct uploads work without one. If configured, it must be a signed preset.
 - Existing core tables: admins, events, albums, photos, guest_sessions, admin_sessions (new Preview databases can be initialized with migrations/0001_init.sql)
 
 Expected existing core columns:
@@ -20,7 +20,7 @@ Set in Pages → Settings → Variables and secrets → Production:
 - CLOUDINARY_CLOUD_NAME (Text)
 - CLOUDINARY_API_KEY (Text)
 - CLOUDINARY_API_SECRET (Secret; never expose in browser JavaScript)
-- CLOUDINARY_UPLOAD_PRESET (Text; value ramesh_photography; if omitted the app defaults to this preset)
+- CLOUDINARY_UPLOAD_PRESET (Text; optional; only set this when the named preset is configured as signed in Cloudinary)
 - ADMIN_BOOTSTRAP_KEY (Secret; generate and retain a long random value)
 
 Keep the existing Production D1 binding named DB. Do not put secrets in GitHub files, browser JavaScript, HTML or README.
@@ -32,7 +32,7 @@ Set these separately in Pages → Settings → Preview → Variables and secrets
 - CLOUDINARY_API_SECRET (Secret)
 - ADMIN_BOOTSTRAP_KEY (Secret; use a new random 32-byte value, different from any Production bootstrap key)
 - CLOUDINARY_FOLDER_PREFIX (Text; set to ramesh-photography-preview so test uploads stay in a separate Cloudinary folder)
-- CLOUDINARY_UPLOAD_PRESET is optional; if omitted the app defaults to ramesh_photography.
+- CLOUDINARY_UPLOAD_PRESET is optional; when omitted, the app signs and sends only the Preview folder and timestamp. If set, the named preset must be configured as signed in Cloudinary.
 
 Use the same Cloudinary account credentials only if you intend to store Preview test files in that Cloudinary account. Preview uploads will be written under ramesh-photography-preview/<event-code>, separated from the Production ramesh-photography/<event-code> folders.
 
@@ -55,7 +55,7 @@ The bootstrap key is only sent over HTTPS to the Pages Function. Passwords are s
 - Admin bootstrap and login/logout
 - Admin event listing, event creation and archival
 - Album creation
-- Signed Cloudinary image/video uploads; API secret stays server-side
+- Signed Cloudinary image/video uploads without requiring an upload preset; optional presets must be signed, and API secret stays server-side
 - D1 media metadata and public event gallery
 - Paginated gallery loading, optimized Cloudinary thumbnails, album filters, photo/video preview
 - QR code generation/download and original file download links
