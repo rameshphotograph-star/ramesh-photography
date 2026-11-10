@@ -17,6 +17,7 @@ async function runCheck(){
   statusCard("Database schema",Boolean(data.schemaReady),data.schemaReady?"Required tables and columns are present.":"Some required tables or columns are missing.");
   statusCard("Cloudinary server configuration",Boolean(data.cloudinaryConfigured),data.cloudinaryConfigured?"Cloudinary variables are present; values remain hidden.":"One or more Cloudinary variables are missing.");
   statusCard("Admin bootstrap secret",Boolean(data.adminBootstrapConfigured),data.adminBootstrapConfigured?"Bootstrap secret is present; value remains hidden.":"ADMIN_BOOTSTRAP_KEY is missing.");
+  statusCard("Preview media folder isolation",Boolean(data.previewFolderIsolated),data.previewFolderIsolated?"Test uploads use the separate ramesh-photography-preview folder.":"CLOUDINARY_FOLDER_PREFIX is missing or not isolated from Production.");
   const problems=[];
   (data.missingTables||[]).forEach(table=>problems.push("Missing table: "+table));
   Object.entries(data.missingColumns||{}).forEach(([table,columns])=>columns.forEach(column=>problems.push("Missing column: "+table+"."+column)));
