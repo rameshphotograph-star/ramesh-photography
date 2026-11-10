@@ -8,12 +8,12 @@ export async function cloudinarySignature(params, apiSecret) {
 export function cloudinaryConfig(env) {
   const cloudName = env.CLOUDINARY_CLOUD_NAME, apiKey = env.CLOUDINARY_API_KEY, apiSecret = env.CLOUDINARY_API_SECRET;
   const uploadPreset = env.CLOUDINARY_UPLOAD_PRESET || "ramesh_photography";
-  if (!cloudName || !apiKey || !apiSecret) throw new Error("Cloudinary configuration is incomplete. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET in production.");
+  if (!cloudName || !apiKey || !apiSecret) throw new Error("Cloudinary configuration is incomplete. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET in the active Cloudflare environment.");
   return { cloudName, apiKey, apiSecret, uploadPreset };
 }
 export async function createUploadPayload(env, eventCode, resourceType) {
   const config = cloudinaryConfig(env), timestamp = Math.floor(Date.now() / 1000);
-  const folderPrefix = String(env.CLOUDINARY_FOLDER_PREFIX || "ramesh-photography").replace(/^\\/+|\\/+$/g, "");
+  const folderPrefix = String(env.CLOUDINARY_FOLDER_PREFIX || "ramesh-photography").replace(/^\/+|\/+$/g, "");
   const folder = folderPrefix + "/" + eventCode;
   const params = { folder, timestamp: String(timestamp), upload_preset: config.uploadPreset };
   return {
