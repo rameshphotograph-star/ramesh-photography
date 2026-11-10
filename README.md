@@ -83,3 +83,7 @@ Preview deployments are refreshed whenever a new commit is pushed to this featur
 
 
 Preview bootstrap secret refresh: deploy the latest feature-branch Preview build after updating ADMIN_BOOTSTRAP_KEY in the Preview environment. This note does not change Production configuration.
+
+
+## Preview password-hash compatibility note
+Cloudflare Workers rejects a single Web Crypto PBKDF2 derive operation above 100,000 iterations. Preview bootstrap currently uses PBKDF2-HMAC-SHA256 at 100,000 iterations so first-admin creation works on Workers. This is a platform-compatibility setting below current OWASP PBKDF2-HMAC-SHA256 guidance, and it is not approved for Production use. Before Production release, replace it with a reviewed Workers-compatible stronger password KDF (preferably Argon2id) and add runtime-level tests. Do not promote this Preview password-hashing implementation as production-ready.
