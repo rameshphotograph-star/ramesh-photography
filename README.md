@@ -26,7 +26,7 @@ Set in Pages → Settings → Variables and secrets → Production:
 Keep the existing D1 binding named DB. Do not put secrets in GitHub files, browser JavaScript, HTML or README.
 
 ## Database support tables
-The one-time admin bootstrap endpoint creates the two required support tables with CREATE TABLE IF NOT EXISTS after validating the bootstrap secret:
+The admin bootstrap, login and authenticated admin-session paths safely ensure the two support tables with CREATE TABLE IF NOT EXISTS when needed:
 - login_attempts (failed-login throttling)
 - photo_delivery_meta (Cloudinary URLs and image/video metadata)
 
@@ -54,7 +54,7 @@ The bootstrap key is only sent over HTTPS to the Pages Function. Passwords are s
 AI selfie/face matching is not enabled. The UI explains this clearly. Do not advertise My Photos face matching until a reviewed on-device face model, explicit-consent UX, model assets and cross-device tests are completed.
 
 ## Review and deploy
-Review feature/photo-delivery-platform before merging into main. Merge may trigger the existing Cloudflare Pages automatic production deployment. Confirm Production variables/secrets and the DB binding before merge. Preview builds use the Preview environment; configure a separate preview D1 database if you plan to create test events, rather than pointing preview traffic at production client data.
+Review feature/photo-delivery-platform (including /diagnostics.html) before merging into main. Merge may trigger the existing Cloudflare Pages automatic production deployment. Confirm Production variables/secrets and the DB binding before merge. Preview builds use the Preview environment; configure a separate preview D1 database if you plan to create test events, rather than pointing preview traffic at production client data.
 
 ## Manual verification checklist
 - First admin bootstrap succeeds only while admins is empty and creates the support tables.
