@@ -6,7 +6,7 @@ This feature branch upgrades the original static starter into a D1-backed event 
 - Cloudflare Pages project: ramesh-photography
 - D1 binding: DB → ramesh-photo-db
 - Cloudinary upload preset: ramesh_photography (signed mode)
-- Existing core tables: admins, events, albums, photos, guest_sessions, admin_sessions
+- Existing core tables: admins, events, albums, photos, guest_sessions, admin_sessions (new Preview databases can be initialized with migrations/0001_init.sql)
 
 Expected existing core columns:
 - admins: id, name, email, password_hash, is_active, created_at
@@ -30,7 +30,7 @@ The admin bootstrap, login and authenticated admin-session paths safely ensure t
 - login_attempts (failed-login throttling)
 - photo_delivery_meta (Cloudinary URLs and image/video metadata)
 
-This is additive and does not drop or recreate the existing core tables. The equivalent standalone migration is provided at migrations/0002_platform_support.sql for manual/local use. Do not rerun the original 0001_init.sql against a database that already has the six core tables.
+This is additive and does not drop or recreate the existing core tables. The equivalent standalone migration is provided at migrations/0002_platform_support.sql for manual/local use. For a brand-new, empty Preview database, apply migrations/0001_init.sql once, followed by migrations/0002_platform_support.sql. This initial migration uses CREATE TABLE IF NOT EXISTS and does not drop data; Production already has the core tables and does not need it.
 
 ## First admin setup
 After reviewing and deploying this branch, open /admin.html. If the admins table is empty:
