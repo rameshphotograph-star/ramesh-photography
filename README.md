@@ -80,3 +80,6 @@ Preview deployments are refreshed whenever a new commit is pushed to this featur
 - Archived events are no longer publicly accessible; existing media rows remain.
 - QR code opens the event URL on a mobile phone.
 - Gallery pages images in batches, album filters work, and file downloads work in the browser.
+
+
+Preview bootstrap secret refresh: deploy the latest feature-branch Preview build after updating ADMIN_BOOTSTRAP_KEY in the Preview environment. This note does not change Production configuration.
