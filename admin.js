@@ -124,7 +124,7 @@ $("downloadQr").addEventListener("click",()=>{
 $("printQr").addEventListener("click",()=>{
   const canvas=$("qrCode").querySelector("canvas"),image=$("qrCode").querySelector("img"),src=canvas?canvas.toDataURL("image/png"):image?.src;
   if(!src||!selectedEvent)return say("QR code is not ready.",true);
-  const win=window.open("","_blank","noopener,noreferrer,width=600,height=750");
+  const win=window.open("","_blank","width=600,height=750");
   if(!win)return say("Allow pop-ups to print the QR card.",true);
   const title=selectedEvent.event_name.replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
   const code=selectedEvent.event_code;
