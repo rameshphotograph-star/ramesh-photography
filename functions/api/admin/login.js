@@ -1,11 +1,14 @@
 import { json, error, readJson, text, validEmail, requireDb } from "../../_lib/http.js";
 import { verifyPassword, randomToken, sha256Hex } from "../../_lib/crypto.js";
 import { sessionCookie, clientIp } from "../../_lib/auth.js";
+import { ensureSupportTables } from "../../_lib/schema.js";
+
 export async function onRequestPost({ request, env }) {
   try {
     const db = requireDb(env), input = await readJson(request);
     const email = text(input.email, 190).toLowerCase(), password = typeof input.password === "string" ? input.password : "";
     if (!validEmail(email) || !password) return error("Enter your email and password.");
+    await ensureSupportTables(db);
     const ipHash = await sha256Hex(clientIp(request));
     const attempts = await db.prepare("SELECT COUNT(*) AS total FROM login_attempts WHERE ip_hash=? AND success=0 AND attempted_at>=datetime('now','-15 minutes')").bind(ipHash).first();
     if (Number(attempts?.total || 0) >= 5) return error("Too many failed attempts. Try again in 15 minutes.", 429);
