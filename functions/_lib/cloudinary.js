@@ -13,7 +13,8 @@ export function cloudinaryConfig(env) {
 }
 export async function createUploadPayload(env, eventCode, resourceType) {
   const config = cloudinaryConfig(env), timestamp = Math.floor(Date.now() / 1000);
-  const folder = "ramesh-photography/" + eventCode;
+  const folderPrefix = String(env.CLOUDINARY_FOLDER_PREFIX || "ramesh-photography").replace(/^\\/+|\\/+$/g, "");
+  const folder = folderPrefix + "/" + eventCode;
   const params = { folder, timestamp: String(timestamp), upload_preset: config.uploadPreset };
   return {
     cloudName: config.cloudName, apiKey: config.apiKey, uploadPreset: config.uploadPreset,
