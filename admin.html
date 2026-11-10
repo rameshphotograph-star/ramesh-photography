@@ -1,23 +1,28 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Admin | Ramesh Photography</title><link rel="stylesheet" href="style.css">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin | Ramesh Photography</title><link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script><script src="admin.js" defer></script>
 </head>
 <body>
 <header class="top"><a class="brand" href="./">RAMESH <span>PHOTOGRAPHY</span></a><a class="admin-link" href="./">Guest page</a></header>
 <main class="admin-main">
-  <div class="eyebrow">PHOTOGRAPHER WORKSPACE</div><h1>Admin setup</h1>
-  <p>This starter package contains the website design and guest event-code screen.</p>
-  <div class="notice"><strong>Important:</strong> This is the first website UI package only. Admin login, secure photo uploads, shared cloud storage, real QR generation, “All Photos”, and selfie-based “My Photos” matching must be connected before using it with real client events.</div>
-  <h2>Planned event tools</h2>
-  <div class="features">
-    <article><b>01</b><h3>Create event</h3><p>Add a wedding, birthday, or other event and assign an event code.</p></article>
-    <article><b>02</b><h3>Upload photos</h3><p>Store event photographs securely in cloud storage.</p></article>
-    <article><b>03</b><h3>Print QR code</h3><p>Create a QR code that opens the correct event gallery.</p></article>
-    <article><b>04</b><h3>Guest delivery</h3><p>Offer All Photos and My Photos (selfie matching) to guests.</p></article>
-  </div>
-  <p class="back"><a href="./">← Back to guest page</a></p>
-</main>
-<footer>© <span id="year"></span> Ramesh Photography</footer><script src="app.js"></script>
+<div class="eyebrow">PHOTOGRAPHER WORKSPACE</div><h1>Admin dashboard</h1><p>Manage events, albums, uploads and guest QR codes.</p>
+<section id="setupPanel" class="admin-panel" hidden><h2>First-time admin setup</h2><p class="help-text">Create the first master account. Setup locks automatically after one account is created.</p>
+<form id="bootstrapForm" class="stack-form"><label>Bootstrap key<input id="bootstrapKey" type="password" autocomplete="off" required></label><label>Your name<input id="adminName" required maxlength="100"></label><label>Email<input id="adminEmail" type="email" required autocomplete="email"></label><label>Password (at least 12 characters)<input id="adminPassword" type="password" minlength="12" required autocomplete="new-password"></label><button type="submit">Create master account</button></form></section>
+<section id="loginPanel" class="admin-panel" hidden><h2>Admin login</h2><form id="loginForm" class="stack-form"><label>Email<input id="loginEmail" type="email" required autocomplete="username"></label><label>Password<input id="loginPassword" type="password" required autocomplete="current-password"></label><button type="submit">Sign in</button></form></section>
+<section id="dashboardPanel" hidden>
+<div class="dashboard-heading"><div><h2 id="welcomeName"></h2><p class="help-text">Your events and guest delivery workspace.</p></div><button id="logoutButton" type="button" class="button-secondary">Log out</button></div>
+<div class="admin-columns">
+<section class="admin-panel"><h2>Create event</h2><form id="eventCreateForm" class="stack-form"><label>Event name<input id="newEventName" required maxlength="160" placeholder="e.g. Ananya & Rahul Wedding"></label><label>Event type<select id="newEventType"><option value="wedding">Wedding</option><option value="haldi">Haldi</option><option value="reception">Reception</option><option value="birthday">Birthday</option><option value="other">Other</option></select></label><label>Event date<input id="newEventDate" type="date"></label><label>Venue<input id="newEventVenue" maxlength="180"></label><button type="submit">Create event</button></form></section>
+<section class="admin-panel"><h2>Upload photos & videos</h2><form id="uploadForm" class="stack-form"><label>Choose event<select id="uploadEvent" required></select></label><label>Album<select id="uploadAlbum"><option value="">No album</option></select></label><label>Select files<input id="mediaFiles" type="file" accept="image/*,video/*" multiple required></label><p class="help-text">Images and videos up to 100 MB each. Uploads use signed Cloudinary requests.</p><button type="submit">Upload selected files</button><progress id="uploadProgress" max="100" value="0"></progress></form></section></div>
+<section class="admin-panel"><h2>Your events</h2><div id="eventList" class="event-list"></div></section>
+<section id="eventTools" class="admin-panel" hidden><div class="dashboard-heading"><div><h2 id="selectedEventName"></h2><p id="selectedEventCode" class="help-text"></p></div><button id="archiveEvent" type="button" class="button-secondary">Archive event</button></div>
+<div class="admin-columns"><div><h3>Guest QR code</h3><div id="qrCode" class="qr-code"></div><button id="downloadQr" class="button-secondary" type="button">Download QR PNG</button><a id="guestLink" class="download-link" target="_blank" rel="noopener">Open guest gallery</a></div><div><h3>Create album</h3><form id="albumForm" class="inline-form"><input id="albumName" placeholder="Album name" required maxlength="100"><button type="submit">Add album</button></form><div id="albumList" class="album-list"></div></div></div>
+<h3>Uploaded media</h3><div id="mediaList" class="media-list"></div></section>
+<section class="admin-panel privacy-panel"><h2>My Photos – selfie matching</h2><p>Face matching is currently disabled. Do not capture or upload guest selfies until a verified on-device model and explicit-consent flow are installed and tested. The normal event gallery works without it.</p></section>
+</section>
+<div id="adminMessage" class="status-message" role="status" aria-live="polite"></div>
+</main><footer>© <span id="year"></span> Ramesh Photography</footer>
 </body></html>

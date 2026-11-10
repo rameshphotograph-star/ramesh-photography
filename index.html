@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="View and download your Ramesh Photography event photographs.">
   <title>Ramesh Photography | Event Photos</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -15,12 +16,20 @@
       <h2>Open your event gallery</h2>
       <form id="eventForm">
         <label for="eventCode">Event code</label>
-        <div class="form-row"><input id="eventCode" placeholder="Enter event code" required><button>View photos</button></div>
+        <div class="form-row"><input id="eventCode" name="eventCode" placeholder="Enter event code" autocomplete="off" required><button type="submit">View photos</button></div>
       </form>
       <small>For the event code, please contact the photographer.</small>
-      <div id="message" role="status"></div>
+      <div id="message" role="status" aria-live="polite"></div>
     </section>
   </main>
+  <main id="galleryView" class="gallery-view" hidden>
+    <div class="gallery-heading"><div><div class="eyebrow">YOUR EVENT GALLERY</div><h2 id="eventTitle"></h2><p id="eventDetails"></p></div><button id="changeEvent" class="button-secondary" type="button">Change event</button></div>
+    <div class="gallery-toolbar"><div id="albumFilters" class="album-filters"></div><button id="downloadAll" class="button-secondary" type="button">Download photos</button></div>
+    <div id="photoGrid" class="photo-grid"></div>
+    <div id="galleryMessage" class="status-message" role="status"></div>
+    <p class="privacy-note">Selfie matching is not enabled yet. Your event gallery remains available without face processing.</p>
+  </main>
+  <dialog id="photoDialog" class="photo-dialog"><button type="button" id="closePhoto" class="dialog-close" aria-label="Close">×</button><div id="dialogMedia"></div><a id="downloadPhoto" class="download-link" download>Download original</a></dialog>
   <footer>© <span id="year"></span> Ramesh Photography</footer>
   <script src="app.js"></script>
 </body></html>
