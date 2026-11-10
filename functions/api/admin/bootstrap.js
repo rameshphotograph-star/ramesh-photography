@@ -1,12 +1,6 @@
 import { json, error, readJson, text, validEmail, requireDb } from "../../_lib/http.js";
 import { hashPassword, constantTimeTextEqual } from "../../_lib/crypto.js";
-
-async function ensureSupportTables(db) {
-  await db.prepare("CREATE TABLE IF NOT EXISTS login_attempts (id INTEGER PRIMARY KEY AUTOINCREMENT, ip_hash TEXT NOT NULL, attempted_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, success INTEGER NOT NULL DEFAULT 0)").run();
-  await db.prepare("CREATE INDEX IF NOT EXISTS idx_login_attempts_ip_time ON login_attempts(ip_hash, attempted_at)").run();
-  await db.prepare("CREATE TABLE IF NOT EXISTS photo_delivery_meta (photo_id INTEGER PRIMARY KEY, secure_url TEXT NOT NULL, resource_type TEXT NOT NULL DEFAULT 'image', width INTEGER, height INTEGER, format TEXT, duration REAL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(photo_id) REFERENCES photos(id) ON DELETE CASCADE)").run();
-  await db.prepare("CREATE INDEX IF NOT EXISTS idx_photo_delivery_meta_type ON photo_delivery_meta(resource_type)").run();
-}
+import { ensureSupportTables } from "../../_lib/schema.js";
 
 export async function onRequestPost({ request, env }) {
   try {
@@ -16,8 +10,7 @@ export async function onRequestPost({ request, env }) {
     if (!env.ADMIN_BOOTSTRAP_KEY) return error("ADMIN_BOOTSTRAP_KEY is not configured in Cloudflare Pages secrets.", 503);
     if (!constantTimeTextEqual(bootstrapKey, env.ADMIN_BOOTSTRAP_KEY)) return error("Invalid bootstrap key.", 403);
 
-    // A valid bootstrap key may safely ensure the two additive support tables,
-    // even when an admin account was created earlier.
+    // Safe, additive setup also repairs an existing admin installation.
     await ensureSupportTables(db);
 
     const count = await db.prepare("SELECT COUNT(*) AS total FROM admins").first();
