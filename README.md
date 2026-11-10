@@ -67,6 +67,9 @@ AI selfie/face matching is not enabled. The UI explains this clearly. Do not adv
 ## Review and deploy
 Review feature/photo-delivery-platform (including /diagnostics.html) before merging into main. Merge may trigger the existing Cloudflare Pages automatic production deployment. Confirm Production variables/secrets and the DB binding before merge. Preview builds use the Preview environment; configure a separate preview D1 database if you plan to create test events, rather than pointing preview traffic at production client data.
 
+
+Preview deployments are refreshed whenever a new commit is pushed to this feature branch. After changing Preview variables/secrets, confirm the newest Cloudflare Pages Preview deployment has completed before testing `/admin.html` or `/diagnostics.html`.
+
 ## Manual verification checklist
 - First admin bootstrap succeeds only while admins is empty and creates the support tables.
 - Bad admin credentials fail and login attempts are throttled.
