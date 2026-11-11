@@ -4,6 +4,7 @@ import {
   ALLOWED_GITHUB_USER_ID,
   GITHUB_CALLBACK_PATH,
   githubOAuthConfigured,
+  githubOAuthStarted,
   validateGithubRedirectUri,
   createPkcePair,
   createGithubAuthorizeUrl,
@@ -23,6 +24,8 @@ test("only the explicitly allowlisted GitHub identity is accepted", () => {
 test("OAuth configuration requires client ID, secret and callback URL", () => {
   assert.equal(githubOAuthConfigured({ GITHUB_OAUTH_CLIENT_ID: "id", GITHUB_OAUTH_CLIENT_SECRET: "secret", GITHUB_OAUTH_REDIRECT_URI: "https://site.pages.dev" }), true);
   assert.equal(githubOAuthConfigured({ GITHUB_OAUTH_CLIENT_ID: "id", GITHUB_OAUTH_REDIRECT_URI: "https://site.pages.dev" }), false);
+  assert.equal(githubOAuthStarted({ GITHUB_OAUTH_CLIENT_ID: "id" }), true);
+  assert.equal(githubOAuthStarted({}), false);
 });
 
 test("callback URL must be HTTPS and use the exact callback path", () => {
