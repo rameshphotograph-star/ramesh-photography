@@ -15,13 +15,45 @@ Expected existing core columns:
 - photos: id, event_id, album_id, object_key, file_name, content_type, file_size, uploaded_at
 - admin_sessions: id, admin_id, token_hash, expires_at, created_at
 
+## GitHub-only Admin sign-in
+
+The application can use a single-owner GitHub OAuth App for Admin authentication while keeping Guest Gallery and QR links public. The allowlist is pinned to the authenticated repository owner's immutable GitHub user ID `340888996` (login `rameshphotograph-star`). GitHub tokens are used only for the callback and are not stored.
+
+Create a GitHub OAuth App at https://github.com/settings/developers with:
+- Application name: Ramesh Photography Admin
+- Homepage URL: the exact Pages Preview or Production base URL
+- Authorization callback URL: the exact `GITHUB_OAUTH_REDIRECT_URI` value below
+- Device Flow: disabled
+
+The OAuth flow uses random state, PKCE S256, `read:user` and `user:email` scopes, exact HTTPS callback validation, and requires the allowlisted numeric GitHub ID plus a verified primary email. It links the only existing active admin row on first sign-in, or creates the first admin row if the database is empty. If multiple admin rows exist and none is linked, it fails closed.
+
+When all three OAuth variables are configured, email/password login and bootstrap are disabled. When they are absent, the Preview password login remains available for testing only.
+
+### Preview OAuth variables
+
+Set in Pages → Settings → Preview → Variables and secrets:
+- `GITHUB_OAUTH_CLIENT_ID` (Text)
+- `GITHUB_OAUTH_CLIENT_SECRET` (Secret)
+- `GITHUB_OAUTH_REDIRECT_URI` (Text): `https://feature-photo-delivery-platf.ramesh-photography.pages.dev/api/admin/oauth/github/callback`
+
+For the GitHub OAuth App's Preview test, set its Homepage URL to `https://feature-photo-delivery-platf.ramesh-photography.pages.dev` and its callback URL to the exact Preview URI above. After saving Preview variables, trigger/confirm a new Preview deployment before testing.
+
+### Production OAuth variables
+
+Set the same three variables separately under Pages → Settings → Production:
+- `GITHUB_OAUTH_CLIENT_ID` (Text)
+- `GITHUB_OAUTH_CLIENT_SECRET` (Secret)
+- `GITHUB_OAUTH_REDIRECT_URI` (Text): `https://ramesh-photography.pages.dev/api/admin/oauth/github/callback`
+
+Before Production deployment, update the GitHub OAuth App Homepage URL and callback URL to the exact Production values above. The app uses one callback URL at a time; after changing it from Preview to Production, Preview GitHub OAuth will no longer work until the callback is switched back.
+
 ## Required Cloudflare production variables/secrets
 Set in Pages → Settings → Variables and secrets → Production:
 - CLOUDINARY_CLOUD_NAME (Text)
 - CLOUDINARY_API_KEY (Text)
 - CLOUDINARY_API_SECRET (Secret; never expose in browser JavaScript)
 - CLOUDINARY_UPLOAD_PRESET (Text; optional; only set this when the named preset is configured as signed in Cloudinary)
-- ADMIN_BOOTSTRAP_KEY (Secret; generate and retain a long random value)
+- ADMIN_BOOTSTRAP_KEY (Secret; only needed for legacy password-based bootstrap when GitHub OAuth is not configured)
 
 Keep the existing Production D1 binding named DB. Do not put secrets in GitHub files, browser JavaScript, HTML or README.
 
@@ -51,10 +83,11 @@ After reviewing and deploying this branch, open /admin.html. If the admins table
 2. Set admin name, email and a strong password (12+ characters).
 3. Create the first account. Bootstrap locks after an admin row exists.
 4. Sign in.
-The bootstrap key is only sent over HTTPS to the Pages Function. Passwords are stored as PBKDF2-SHA-256 hashes. Sessions use HttpOnly, Secure, SameSite=Strict cookies.
+The bootstrap key is only sent over HTTPS to the Pages Function. When GitHub OAuth is configured, the first allowlisted GitHub sign-in provisions/links the Admin account and password bootstrap is disabled. Without OAuth variables, passwords use the Preview-only PBKDF2 compatibility setting and must not be used for Production. Sessions use HttpOnly, Secure, SameSite=Strict cookies.
 
 ## Included in this branch
-- Admin bootstrap and login/logout
+- Single-owner GitHub OAuth Admin sign-in with state + PKCE S256, verified primary-email verification, immutable GitHub user-ID allowlist, and D1 identity binding
+- Legacy Preview-only admin bootstrap/login/logout (automatically disabled when GitHub OAuth is fully configured)
 - Admin event listing, event creation and archival
 - Album creation
 - Signed Cloudinary image/video uploads without requiring an upload preset; optional presets must be signed, and API secret stays server-side
