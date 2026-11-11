@@ -2,8 +2,10 @@ import { json, error, readJson, text, validEmail, requireDb, isSameOriginRequest
 import { verifyPassword, randomToken, sha256Hex } from "../../_lib/crypto.js";
 import { sessionCookie, clientIp } from "../../_lib/auth.js";
 import { ensureSupportTables } from "../../_lib/schema.js";
+import { githubOAuthConfigured } from "../../_lib/github-oauth.js";
 
 export async function onRequestPost({ request, env }) {
+  if (githubOAuthConfigured(env)) return error("Password login is disabled. Use the approved GitHub sign-in.", 403);
   if (!isSameOriginRequest(request)) return error("Cross-origin request blocked.", 403);
   try {
     const db = requireDb(env), input = await readJson(request);
