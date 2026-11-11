@@ -19,12 +19,14 @@ async function initialize(){
     try{
       const data=await api("/api/admin/bootstrap-status",{method:"GET"});
       const oauthEnabled=Boolean(data.githubOAuthConfigured);
-      setupPanel.hidden=oauthEnabled||!data.needsBootstrap;
-      loginPanel.hidden=oauthEnabled?false:data.needsBootstrap;
+      const oauthMisconfigured=Boolean(data.githubOAuthMisconfigured);
+      setupPanel.hidden=oauthEnabled||oauthMisconfigured||!data.needsBootstrap;
+      loginPanel.hidden=oauthEnabled||oauthMisconfigured?false:data.needsBootstrap;
       $("githubLoginButton").hidden=!oauthEnabled;
       $("githubLoginHint").hidden=!oauthEnabled;
-      $("loginForm").hidden=oauthEnabled;
+      $("loginForm").hidden=oauthEnabled||oauthMisconfigured;
       if(oauthEnabled)say("Use your approved GitHub account to access the admin workspace.");
+      if(oauthMisconfigured)say("GitHub sign-in setup is incomplete. Ask the site owner to finish all three Cloudflare OAuth settings.",true);
       if(oauthError)say(oauthError,true);
     }catch(err){setupPanel.hidden=true;loginPanel.hidden=false;say(err.message,true);}
   }
