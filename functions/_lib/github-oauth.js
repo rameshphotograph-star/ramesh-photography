@@ -5,6 +5,10 @@ export const GITHUB_STATE_COOKIE = "rp_github_oauth_state";
 export const GITHUB_VERIFIER_COOKIE = "rp_github_oauth_verifier";
 export const GITHUB_CALLBACK_PATH = "/api/admin/oauth/github/callback";
 
+export function githubOAuthStarted(env) {
+  return Boolean(env?.GITHUB_OAUTH_CLIENT_ID || env?.GITHUB_OAUTH_CLIENT_SECRET || env?.GITHUB_OAUTH_REDIRECT_URI);
+}
+
 export function githubOAuthConfigured(env) {
   return Boolean(env?.GITHUB_OAUTH_CLIENT_ID && env?.GITHUB_OAUTH_CLIENT_SECRET && env?.GITHUB_OAUTH_REDIRECT_URI);
 }
