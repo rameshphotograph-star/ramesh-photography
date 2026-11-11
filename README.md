@@ -9,7 +9,7 @@ This feature branch upgrades the original static starter into a D1-backed event 
 - Existing core tables: admins, events, albums, photos, guest_sessions, admin_sessions (new Preview databases can be initialized with migrations/0001_init.sql)
 
 Expected existing core columns:
-- admins: id, name, email, password_hash, is_active, created_at
+- admins: id, name, email, password_hash, is_active, created_at, github_user_id
 - events: id, admin_id, event_name, event_type, event_date, venue, event_code, status, created_at
 - albums: id, event_id, album_name, created_at
 - photos: id, event_id, album_id, object_key, file_name, content_type, file_size, uploaded_at
@@ -73,9 +73,9 @@ The admin bootstrap, login and authenticated admin-session paths safely ensure s
 - login_attempts (failed-login throttling by IP and normalized account identifier)
 - photo_delivery_meta (Cloudinary URLs and image/video metadata)
 
-The support-table initializer adds the account-throttle column to an existing login_attempts table without dropping data. The standalone migration is migrations/0003_login_email_throttle.sql.
+The support initializer adds the account-throttle column and GitHub identity column/index without dropping data. Standalone migrations are migrations/0003_login_email_throttle.sql and migrations/0004_github_admin_identity.sql.
 
-This is additive and does not drop or recreate the existing core tables. The equivalent standalone migrations are provided at migrations/0002_platform_support.sql and migrations/0003_login_email_throttle.sql for manual/local use. For a brand-new, empty Preview database, apply migrations/0001_init.sql once, followed by migrations/0002_platform_support.sql. This initial migration uses CREATE TABLE IF NOT EXISTS and does not drop data; Production already has the core tables and does not need it.
+This is additive and does not drop or recreate the existing core tables. The equivalent standalone migrations are provided at migrations/0002_platform_support.sql, migrations/0003_login_email_throttle.sql and migrations/0004_github_admin_identity.sql for manual/local use. For a brand-new, empty Preview database, apply migrations/0001_init.sql once, followed by migrations/0002_platform_support.sql. This initial migration uses CREATE TABLE IF NOT EXISTS and does not drop data; Production already has the core tables and does not need it.
 
 ## First admin setup
 After reviewing and deploying this branch, open /admin.html. If the admins table is empty:
@@ -107,10 +107,11 @@ Preview deployments are refreshed whenever a new commit is pushed to this featur
 
 ## Manual verification checklist
 - First admin bootstrap succeeds only while admins is empty and creates the support tables.
-- Bad admin credentials fail; login attempts are throttled to 5 per IP and 10 per normalized account identifier in a rolling 15-minute window.
+- When GitHub OAuth is configured, only GitHub user ID 340888996 can sign in; other GitHub accounts are rejected.
+- Incomplete OAuth environment configuration fails closed and does not re-enable password login.
 - State-changing admin API calls reject requests without an exact same-origin Origin header.
 - Malformed or oversized session cookie values fail closed.
-- Session expiry and logout work.
+- Session expiry and logout work; expired session rows are cleaned on successful login.
 - Event creation returns a unique code and only its owner can manage it.
 - Signed Cloudinary upload works for an image and a video.
 - Media metadata is stored in D1 and appears in the public event gallery.
@@ -131,8 +132,8 @@ Preview deployment refresh: redeploy the feature branch after updating the CLOUD
 
 ## Production security review — work in progress
 
-- Admin state-changing API routes now enforce an exact same-origin Origin check in addition to the Secure, HttpOnly, SameSite=Strict session cookie.
-- Login throttling now applies both per client IP (5 failed attempts / 15 minutes) and per normalized account identifier (10 failed attempts / 15 minutes); existing D1 data is preserved when adding the email_hash column.
-- Expired admin sessions are cleaned up when a new login succeeds.
-- The current Preview password hash uses PBKDF2-HMAC-SHA256 at 100,000 iterations because Cloudflare Workers rejects a single deriveBits request above that value. This is below current OWASP guidance for PBKDF2-HMAC-SHA256 and is not Production-approved. A stronger KDF must be selected and runtime-benchmarked against the actual Cloudflare Workers plan limits before Production merge.
-- Production deployment remains blocked until the password-authentication design is resolved and the full security checklist is signed off.
+- Admin state-changing API routes enforce an exact same-origin Origin check in addition to Secure, HttpOnly, SameSite=Strict session cookies.
+- Login throttling applies by client IP (5 failures / 15 minutes) and normalized account identifier (10 failures / 15 minutes); D1 upgrades are additive.
+- Once any GitHub OAuth variable is configured, all Admin sessions must be linked to allowlisted GitHub ID 340888996; incomplete OAuth configuration fails closed.
+- Production must use GitHub-only Admin sign-in. The Preview 100,000-iteration PBKDF2 fallback is below current OWASP guidance and is explicitly not Production-approved.
+- Production remains blocked until the OAuth App callback is switched to the Production pages.dev URL, Production OAuth secrets and D1 binding/backups are verified, and a Production smoke test is completed.
