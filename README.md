@@ -37,11 +37,13 @@ Set these separately in Pages → Settings → Preview → Variables and secrets
 Use the same Cloudinary account credentials only if you intend to store Preview test files in that Cloudinary account. Preview uploads will be written under ramesh-photography-preview/<event-code>, separated from the Production ramesh-photography/<event-code> folders.
 
 ## Database support tables
-The admin bootstrap, login and authenticated admin-session paths safely ensure the two support tables with CREATE TABLE IF NOT EXISTS when needed:
-- login_attempts (failed-login throttling)
+The admin bootstrap, login and authenticated admin-session paths safely ensure support schema when needed:
+- login_attempts (failed-login throttling by IP and normalized account identifier)
 - photo_delivery_meta (Cloudinary URLs and image/video metadata)
 
-This is additive and does not drop or recreate the existing core tables. The equivalent standalone migration is provided at migrations/0002_platform_support.sql for manual/local use. For a brand-new, empty Preview database, apply migrations/0001_init.sql once, followed by migrations/0002_platform_support.sql. This initial migration uses CREATE TABLE IF NOT EXISTS and does not drop data; Production already has the core tables and does not need it.
+The support-table initializer adds the account-throttle column to an existing login_attempts table without dropping data. The standalone migration is migrations/0003_login_email_throttle.sql.
+
+This is additive and does not drop or recreate the existing core tables. The equivalent standalone migrations are provided at migrations/0002_platform_support.sql and migrations/0003_login_email_throttle.sql for manual/local use. For a brand-new, empty Preview database, apply migrations/0001_init.sql once, followed by migrations/0002_platform_support.sql. This initial migration uses CREATE TABLE IF NOT EXISTS and does not drop data; Production already has the core tables and does not need it.
 
 ## First admin setup
 After reviewing and deploying this branch, open /admin.html. If the admins table is empty:
@@ -72,7 +74,9 @@ Preview deployments are refreshed whenever a new commit is pushed to this featur
 
 ## Manual verification checklist
 - First admin bootstrap succeeds only while admins is empty and creates the support tables.
-- Bad admin credentials fail and login attempts are throttled.
+- Bad admin credentials fail; login attempts are throttled to 5 per IP and 10 per normalized account identifier in a rolling 15-minute window.
+- State-changing admin API calls reject requests without an exact same-origin Origin header.
+- Malformed or oversized session cookie values fail closed.
 - Session expiry and logout work.
 - Event creation returns a unique code and only its owner can manage it.
 - Signed Cloudinary upload works for an image and a video.
@@ -90,3 +94,12 @@ Cloudflare Workers rejects a single Web Crypto PBKDF2 derive operation above 100
 
 
 Preview deployment refresh: redeploy the feature branch after updating the CLOUDINARY_CLOUD_NAME Preview variable so the new value is active in Pages Functions.
+
+
+## Production security review — work in progress
+
+- Admin state-changing API routes now enforce an exact same-origin Origin check in addition to the Secure, HttpOnly, SameSite=Strict session cookie.
+- Login throttling now applies both per client IP (5 failed attempts / 15 minutes) and per normalized account identifier (10 failed attempts / 15 minutes); existing D1 data is preserved when adding the email_hash column.
+- Expired admin sessions are cleaned up when a new login succeeds.
+- The current Preview password hash uses PBKDF2-HMAC-SHA256 at 100,000 iterations because Cloudflare Workers rejects a single deriveBits request above that value. This is below current OWASP guidance for PBKDF2-HMAC-SHA256 and is not Production-approved. A stronger KDF must be selected and runtime-benchmarked against the actual Cloudflare Workers plan limits before Production merge.
+- Production deployment remains blocked until the password-authentication design is resolved and the full security checklist is signed off.
