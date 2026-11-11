@@ -53,14 +53,18 @@ test("OAuth-enabled sessions must belong to the allowlisted GitHub-linked admin"
   assert.equal(db.inspect().bindings[1], "340888996");
 });
 
-test("legacy preview sessions remain usable only when GitHub OAuth is not configured", async () => {
+test("sessions are still GitHub-bound when OAuth configuration is only partially present", async () => {
   const db = mockDb({ id: 7, name: "Ramesh", email: "ramesh@example.com" });
   const request = new Request("https://photos.example.test/admin.html", {
     headers: { Cookie: COOKIE_NAME + "=session-token" }
   });
-  const admin = await authenticateAdmin(request, { DB: db });
+  const admin = await authenticateAdmin(request, {
+    DB: db,
+    GITHUB_OAUTH_CLIENT_ID: "client-id"
+  });
   assert.equal(admin.id, 7);
-  assert.doesNotMatch(db.inspect().sql, /github_user_id/);
+  assert.match(db.inspect().sql, /a\\.github_user_id=\\?/);
+  assert.equal(db.inspect().bindings[1], "340888996");
 });
 
 test("malformed and oversized session cookies fail closed", () => {
