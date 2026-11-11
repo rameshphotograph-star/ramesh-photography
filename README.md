@@ -27,7 +27,7 @@ Create a GitHub OAuth App at https://github.com/settings/developers with:
 
 The OAuth flow uses random state, PKCE S256, `read:user` and `user:email` scopes, exact HTTPS callback validation, and requires the allowlisted numeric GitHub ID plus a verified primary email. It links the only existing active admin row on first sign-in, or creates the first admin row if the database is empty. If multiple admin rows exist and none is linked, it fails closed.
 
-When all three OAuth variables are configured, email/password login and bootstrap are disabled. When they are absent, the Preview password login remains available for testing only.
+When all three OAuth variables are configured, email/password login and bootstrap are disabled, and existing session cookies are accepted only when their admin row is linked to the allowlisted GitHub ID. When they are absent, the Preview password login remains available for testing only.
 
 ### Preview OAuth variables
 
