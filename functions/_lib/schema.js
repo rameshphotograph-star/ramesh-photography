@@ -6,12 +6,25 @@ export async function ensureSupportTables(db) {
 
   if (!existing.has("login_attempts")) {
     await db.prepare(
-      "CREATE TABLE IF NOT EXISTS login_attempts (id INTEGER PRIMARY KEY AUTOINCREMENT, ip_hash TEXT NOT NULL, attempted_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, success INTEGER NOT NULL DEFAULT 0)"
+      "CREATE TABLE IF NOT EXISTS login_attempts (id INTEGER PRIMARY KEY AUTOINCREMENT, ip_hash TEXT NOT NULL, email_hash TEXT NOT NULL DEFAULT '', attempted_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, success INTEGER NOT NULL DEFAULT 0)"
     ).run();
     await db.prepare(
       "CREATE INDEX IF NOT EXISTS idx_login_attempts_ip_time ON login_attempts(ip_hash, attempted_at)"
     ).run();
   }
+
+  const loginColumns = await db.prepare("PRAGMA table_info(login_attempts)").all();
+  const loginColumnNames = new Set((loginColumns.results || []).map(column => column.name));
+  if (!loginColumnNames.has("email_hash")) {
+    try {
+      await db.prepare("ALTER TABLE login_attempts ADD COLUMN email_hash TEXT NOT NULL DEFAULT ''").run();
+    } catch (err) {
+      const refreshed = await db.prepare("PRAGMA table_info(login_attempts)").all();
+      const refreshedNames = new Set((refreshed.results || []).map(column => column.name));
+      if (!refreshedNames.has("email_hash")) throw err;
+    }
+  }
+  await db.prepare("CREATE INDEX IF NOT EXISTS idx_login_attempts_email_time ON login_attempts(email_hash, attempted_at)").run();
 
   if (!existing.has("photo_delivery_meta")) {
     await db.prepare(
