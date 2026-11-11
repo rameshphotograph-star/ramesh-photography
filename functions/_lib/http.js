@@ -16,3 +16,13 @@ export function requireDb(env) {
   if (!env || !env.DB) throw new Error("Cloudflare D1 binding DB is missing.");
   return env.DB;
 }
+
+export function isSameOriginRequest(request) {
+  const origin = request.headers.get("Origin");
+  if (!origin) return false;
+  try {
+    return new URL(origin).origin === new URL(request.url).origin;
+  } catch {
+    return false;
+  }
+}
