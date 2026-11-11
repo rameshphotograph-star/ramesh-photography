@@ -1,8 +1,9 @@
-import { json, error, readJson, text, validEmail, requireDb } from "../../_lib/http.js";
+import { json, error, readJson, text, validEmail, requireDb, isSameOriginRequest } from "../../_lib/http.js";
 import { hashPassword, constantTimeTextEqual } from "../../_lib/crypto.js";
 import { ensureSupportTables } from "../../_lib/schema.js";
 
 export async function onRequestPost({ request, env }) {
+  if (!isSameOriginRequest(request)) return error("Cross-origin request blocked.", 403);
   try {
     const db = requireDb(env), input = await readJson(request);
     const bootstrapKey = text(input.bootstrapKey, 300), name = text(input.name, 100);
