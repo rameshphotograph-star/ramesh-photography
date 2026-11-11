@@ -63,7 +63,7 @@ test("sessions are still GitHub-bound when OAuth configuration is only partially
     GITHUB_OAUTH_CLIENT_ID: "client-id"
   });
   assert.equal(admin.id, 7);
-  assert.match(db.inspect().sql, /a\\.github_user_id=\\?/);
+  assert.match(db.inspect().sql, /a\.github_user_id=\?/);
   assert.equal(db.inspect().bindings[1], "340888996");
 });
 
