@@ -15,6 +15,7 @@ export async function onRequestPatch({ request, env, params }) {
   } catch(err) { return error(err.message||"Could not update event.",500); }
 }
 export async function onRequestDelete({ request, env, params }) {
+  if (!isSameOriginRequest(request)) return error("Cross-origin request blocked.", 403);
   const admin = await authenticateAdmin(request, env);
   if (!admin) return error("Not signed in.",401);
   const id=Number(params.id);
