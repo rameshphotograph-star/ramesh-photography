@@ -5,7 +5,14 @@ export function cookieValue(request, name) {
   const cookie = request.headers.get("Cookie") || "";
   for (const part of cookie.split(";")) {
     const item = part.trim(), index = item.indexOf("=");
-    if (index > 0 && item.slice(0, index) === name) return decodeURIComponent(item.slice(index + 1));
+    if (index > 0 && item.slice(0, index) === name) {
+      try {
+        const value = decodeURIComponent(item.slice(index + 1));
+        return value.length <= 128 ? value : "";
+      } catch {
+        return "";
+      }
+    }
   }
   return "";
 }
