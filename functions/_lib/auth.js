@@ -1,6 +1,6 @@
 import { sha256Hex } from "./crypto.js";
 import { ensureSupportTables } from "./schema.js";
-import { githubOAuthConfigured, ALLOWED_GITHUB_USER_ID } from "./github-oauth.js";
+import { githubOAuthStarted, ALLOWED_GITHUB_USER_ID } from "./github-oauth.js";
 export const COOKIE_NAME = "rp_admin_session";
 export function cookieValue(request, name) {
   const cookie = request.headers.get("Cookie") || "";
@@ -27,7 +27,7 @@ export async function authenticateAdmin(request, env) {
   const token = cookieValue(request, COOKIE_NAME);
   if (!token) return null;
   const tokenHash = await sha256Hex(token);
-  const row = githubOAuthConfigured(env)
+  const row = githubOAuthStarted(env)
     ? await env.DB.prepare(
         "SELECT a.id, a.name, a.email FROM admin_sessions s JOIN admins a ON a.id=s.admin_id WHERE s.token_hash=? AND datetime(s.expires_at)>CURRENT_TIMESTAMP AND a.is_active=1 AND a.github_user_id=? LIMIT 1"
       ).bind(tokenHash, ALLOWED_GITHUB_USER_ID).first()
