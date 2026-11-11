@@ -7,10 +7,26 @@ async function api(path,options={}){
   const data=await response.json().catch(()=>({}));if(!response.ok||!data.success)throw new Error(data.error||"Request failed.");return data;
 }
 async function initialize(){
-  try{const data=await api("/api/admin/me",{method:"GET"});showDashboard(data.admin);}
-  catch{
-    try{const data=await api("/api/admin/bootstrap-status",{method:"GET"});setupPanel.hidden=!data.needsBootstrap;loginPanel.hidden=data.needsBootstrap;}
-    catch(err){setupPanel.hidden=true;loginPanel.hidden=false;say(err.message,true);}
+  const query=new URLSearchParams(location.search);
+  const oauthConnected=query.get("github")==="connected";
+  const oauthError=query.get("oauth_error");
+  if(oauthConnected||oauthError)history.replaceState({}, "", location.pathname);
+  try{
+    const data=await api("/api/admin/me",{method:"GET"});
+    showDashboard(data.admin);
+    if(oauthConnected)say("Signed in with your approved GitHub account.");
+  }catch{
+    try{
+      const data=await api("/api/admin/bootstrap-status",{method:"GET"});
+      const oauthEnabled=Boolean(data.githubOAuthConfigured);
+      setupPanel.hidden=oauthEnabled||!data.needsBootstrap;
+      loginPanel.hidden=oauthEnabled?false:data.needsBootstrap;
+      $("githubLoginButton").hidden=!oauthEnabled;
+      $("githubLoginHint").hidden=!oauthEnabled;
+      $("loginForm").hidden=oauthEnabled;
+      if(oauthEnabled)say("Use your approved GitHub account to access the admin workspace.");
+      if(oauthError)say(oauthError,true);
+    }catch(err){setupPanel.hidden=true;loginPanel.hidden=false;say(err.message,true);}
   }
 }
 function showDashboard(admin){setupPanel.hidden=true;loginPanel.hidden=true;dashboardPanel.hidden=false;$("welcomeName").textContent="Welcome, "+admin.name;loadEvents();}
