@@ -1,4 +1,4 @@
-import { json, error, readJson, text } from "../../_lib/http.js";
+import { json, error, readJson, text, isSameOriginRequest } from "../../_lib/http.js";
 import { authenticateAdmin } from "../../_lib/auth.js";
 export async function onRequestGet({ request, env }) {
   const admin=await authenticateAdmin(request,env); if(!admin) return error("Not signed in.",401);
@@ -10,6 +10,7 @@ export async function onRequestGet({ request, env }) {
   return json({success:true,albums:rows.results||[]});
 }
 export async function onRequestPost({ request, env }) {
+  if (!isSameOriginRequest(request)) return error("Cross-origin request blocked.", 403);
   const admin=await authenticateAdmin(request,env); if(!admin) return error("Not signed in.",401);
   try {
     const input=await readJson(request),eventId=Number(input.eventId),albumName=text(input.albumName,100);
