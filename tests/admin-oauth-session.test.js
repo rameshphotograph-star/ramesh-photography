@@ -2,20 +2,38 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { authenticateAdmin, cookieValue, COOKIE_NAME } from "../functions/_lib/auth.js";
 
-function mockDb(row) {
-  let sql = "";
-  let bindings = [];
+function mockDb(adminRow) {
+  let finalQuery = "";
+  let finalBindings = [];
   return {
     prepare(query) {
-      sql = query;
       return {
         bind(...values) {
-          bindings = values;
-          return { first: async () => row };
-        }
+          finalQuery = query;
+          finalBindings = values;
+          return {
+            first: async () => adminRow,
+            all: async () => ({ results: [] }),
+            run: async () => ({ success: true })
+          };
+        },
+        first: async () => adminRow,
+        all: async () => {
+          if (query.includes("sqlite_master")) {
+            return { results: [{ name: "login_attempts" }, { name: "photo_delivery_meta" }] };
+          }
+          if (query.includes("PRAGMA table_info(login_attempts)")) {
+            return { results: ["id", "ip_hash", "email_hash", "attempted_at", "success"].map(name => ({ name })) };
+          }
+          if (query.includes("PRAGMA table_info(admins)")) {
+            return { results: ["id", "name", "email", "password_hash", "is_active", "github_user_id"].map(name => ({ name })) };
+          }
+          return { results: [] };
+        },
+        run: async () => ({ success: true })
       };
     },
-    inspect() { return { sql, bindings }; }
+    inspect() { return { sql: finalQuery, bindings: finalBindings }; }
   };
 }
 
