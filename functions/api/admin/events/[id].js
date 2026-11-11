@@ -1,6 +1,7 @@
-import { json, error, readJson, text } from "../../../_lib/http.js";
+import { json, error, readJson, text, isSameOriginRequest } from "../../../_lib/http.js";
 import { authenticateAdmin } from "../../../_lib/auth.js";
 export async function onRequestPatch({ request, env, params }) {
+  if (!isSameOriginRequest(request)) return error("Cross-origin request blocked.", 403);
   const admin = await authenticateAdmin(request, env);
   if (!admin) return error("Not signed in.",401);
   const id = Number(params.id);
