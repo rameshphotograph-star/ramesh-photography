@@ -1,5 +1,5 @@
 const REQUIRED_COLUMNS = {
-  admins: ["id", "name", "email", "password_hash", "is_active"],
+  admins: ["id", "name", "email", "password_hash", "is_active", "github_user_id"],
   events: ["id", "admin_id", "event_name", "event_type", "event_date", "venue", "event_code", "status", "created_at"],
   albums: ["id", "event_id", "album_name", "created_at"],
   photos: ["id", "event_id", "album_id", "object_key", "file_name", "content_type", "file_size", "uploaded_at"],
