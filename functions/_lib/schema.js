@@ -26,6 +26,19 @@ export async function ensureSupportTables(db) {
   }
   await db.prepare("CREATE INDEX IF NOT EXISTS idx_login_attempts_email_time ON login_attempts(email_hash, attempted_at)").run();
 
+  const adminColumns = await db.prepare("PRAGMA table_info(admins)").all();
+  const adminColumnNames = new Set((adminColumns.results || []).map(column => column.name));
+  if (!adminColumnNames.has("github_user_id")) {
+    try {
+      await db.prepare("ALTER TABLE admins ADD COLUMN github_user_id TEXT").run();
+    } catch (err) {
+      const refreshed = await db.prepare("PRAGMA table_info(admins)").all();
+      const refreshedNames = new Set((refreshed.results || []).map(column => column.name));
+      if (!refreshedNames.has("github_user_id")) throw err;
+    }
+  }
+  await db.prepare("CREATE UNIQUE INDEX IF NOT EXISTS idx_admins_github_user_id ON admins(github_user_id) WHERE github_user_id IS NOT NULL").run();
+
   if (!existing.has("photo_delivery_meta")) {
     await db.prepare(
       "CREATE TABLE IF NOT EXISTS photo_delivery_meta (photo_id INTEGER PRIMARY KEY, secure_url TEXT NOT NULL, resource_type TEXT NOT NULL DEFAULT 'image', width INTEGER, height INTEGER, format TEXT, duration REAL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(photo_id) REFERENCES photos(id) ON DELETE CASCADE)"
