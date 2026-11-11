@@ -1,8 +1,9 @@
-import { json, error, readJson, text } from "../../../_lib/http.js";
+import { json, error, readJson, text, isSameOriginRequest } from "../../../_lib/http.js";
 import { authenticateAdmin } from "../../../_lib/auth.js";
 import { createUploadPayload } from "../../../_lib/cloudinary.js";
 const MAX_BYTES=100*1024*1024;
 export async function onRequestPost({ request, env }) {
+  if (!isSameOriginRequest(request)) return error("Cross-origin request blocked.", 403);
   const admin=await authenticateAdmin(request,env); if(!admin) return error("Not signed in.",401);
   try {
     const input=await readJson(request),eventId=Number(input.eventId),resourceType=text(input.resourceType,10);
