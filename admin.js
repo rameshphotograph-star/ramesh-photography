@@ -180,4 +180,33 @@ $("printQr").addEventListener("click",()=>{
   win.document.write("<!doctype html><html><head><title>Event QR</title><style>body{font-family:Arial,sans-serif;text-align:center;padding:48px;color:#172033}h1{font-family:Georgia,serif;font-weight:400}img{width:300px;height:300px;object-fit:contain;margin:30px auto}p{color:#687386;letter-spacing:2px}@media print{button{display:none}}</style></head><body><p>RAMESH PHOTOGRAPHY</p><h1>"+title+"</h1><img src='"+src+"' alt='Event QR code'><h2>"+code+"</h2><p>SCAN TO VIEW & DOWNLOAD PHOTOS</p><button onclick='window.print()'>Print</button></body></html>");
   win.document.close();
 });
+$("claudeForm").addEventListener("submit",async event=>{
+  event.preventDefault();
+  const button=$("claudeGenerate"),output=$("claudeOutput"),copy=$("claudeCopy");
+  button.disabled=true;button.textContent="Creating…";copy.disabled=true;output.textContent="Claude is preparing your content…";
+  try{
+    const data=await api("/api/admin/ai/assistant",{method:"POST",body:JSON.stringify({
+      task:$("claudeTask").value,
+      language:$("claudeLanguage").value,
+      tone:$("claudeTone").value,
+      brief:$("claudeBrief").value,
+      context:$("claudeContext").value
+    })});
+    output.textContent=data.text;
+    copy.disabled=false;
+    say("Claude content generated. Review all prices, dates and business details before publishing.");
+  }catch(err){
+    output.textContent=err.message;
+    say(err.message,true);
+  }finally{
+    button.disabled=false;button.textContent="Generate with Claude";
+  }
+});
+$("claudeCopy").addEventListener("click",async()=>{
+  const value=$("claudeOutput").textContent||"";
+  if(!value||value==="Your generated content will appear here.")return;
+  try{await navigator.clipboard.writeText(value);say("Generated content copied.");}
+  catch{say("Copy was blocked by the browser. Select the text and copy it manually.",true);}
+});
+
 initialize();
