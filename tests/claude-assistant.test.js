@@ -23,6 +23,6 @@ test("prompt contains the studio context and forbids invented business facts", (
   });
   const prompt = buildAssistantPrompt(input);
   assert.match(prompt, /Ramesh Photography/);
-  assert.match(prompt, /Never invent testimonials, client names, prices/);
+  assert.match(prompt, /Do not invent testimonials, client names, prices/);
   assert.match(prompt, /quotation wording/i);
 });
