@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Setup Check | Ramesh Photography</title><link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top"><a class="brand" href="./">RAMESH <span>PHOTOGRAPHY</span></a><a class="admin-link" href="admin.html">Admin</a></header>
+<main class="admin-main">
+<div class="eyebrow">DEPLOYMENT VERIFICATION</div><h1>Setup check</h1>
+<p>This page checks configuration and database structure. It never displays secret values.</p>
+<section class="admin-panel">
+<div id="healthStatus" class="status-message">Checking preview environment…</div>
+<div id="healthChecks" class="health-checks"></div>
+<div id="schemaIssues" class="schema-issues" hidden></div>
+<button id="refreshHealth" type="button" class="button-secondary">Refresh checks</button>
+</section>
+<p class="help-text">Use this page on the Cloudflare Preview URL first. Do not create test events in a preview environment connected to your production customer database.</p>
+</main>
+<footer>© <span id="year"></span> Ramesh Photography</footer>
+<script src="diagnostics.js"></script>
+</body></html>
