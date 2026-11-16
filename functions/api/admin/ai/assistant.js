@@ -19,7 +19,7 @@ export async function onRequestPost({ request, env }) {
 
   const model = typeof env.CLAUDE_MODEL === "string" && /^[a-zA-Z0-9._-]{3,100}$/.test(env.CLAUDE_MODEL)
     ? env.CLAUDE_MODEL
-    : "claude-sonnet-4-6";
+    : "claude-sonnet-5-5";
   const headers = {
     "authorization": "Bearer " + env.ANTHROPIC_API_KEY,
     "anthropic-version": "2026-10-21",
