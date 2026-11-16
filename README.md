@@ -145,7 +145,7 @@ The authenticated Admin dashboard includes a Claude-powered creative assistant f
 
 Set these in Cloudflare Pages → Settings → Variables and secrets:
 - `ANTHROPIC_API_KEY` (Secret; create it in the Anthropic Console)
-- `CLAUDE_MODEL` (Text; optional; defaults to `claude-sonnet-4-6`)
+- `CLAUDE_MODEL` (Text; optional; defaults to `claude-sonnet-5-5`)
 - `ANTHROPIC_WORKSPACE_ID` (Text; optional; required only for an API key that is not scoped to one workspace)
 
 Add the secret separately to Preview first. Claude generation sends a request to Anthropic and may incur usage charges under the user's Anthropic account. No Claude request is made until the signed-in Admin presses **Generate with Claude**. Never place the API key in GitHub, HTML or browser JavaScript. See the official [Claude API authentication](https://platform.claude.com/docs/en/manage-claude/authentication) and [API overview](https://platform.claude.com/docs/en/api/overview).
