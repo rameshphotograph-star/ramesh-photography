@@ -206,9 +206,10 @@ function makeCreativeDraft({task,language,tone,brief,context}){
 $("claudeForm").addEventListener("submit",event=>{
   event.preventDefault();
   const output=$("claudeOutput"),copy=$("claudeCopy");
-  const brief=$("claudeBrief").value.trim();
-  if(!brief){say("Please enter your brief.",true);return;}
-  const data={task:$("claudeTask").value,language:$("claudeLanguage").value,tone:$("claudeTone").value,brief,context:$("claudeContext").value.trim()};
+  const task=$("claudeTask").value;
+  const enteredBrief=$("claudeBrief").value.trim();
+  const brief=enteredBrief||({instagram_caption:"South Indian wedding photography by Ramesh Photography. Highlight elegant traditional moments, cinematic storytelling and natural candid emotions.",story_campaign:"Promote Ramesh Photography wedding bookings with cinematic films, natural candid moments and a clear enquiry call-to-action.",booking_reply:"Prepare a professional reply to a client enquiring about wedding photography services.",quotation_copy:"Prepare a clear wedding photography quotation draft. Include only confirmed client requirements and details.",marketing_plan:"Create a practical 7-day marketing plan for Ramesh Photography wedding bookings."}[task]||"Create professional content for Ramesh Photography.");
+  const data={task,language:$("claudeLanguage").value,tone:$("claudeTone").value,brief,context:$("claudeContext").value.trim()};
   output.textContent=makeCreativeDraft(data);
   copy.disabled=false;
   say("Draft created using free built-in templates. Review all details before publishing.");
