@@ -25,15 +25,15 @@
 <div><h3>Create album</h3><form id="albumForm" class="inline-form"><input id="albumName" placeholder="Album name" required maxlength="100"><button type="submit">Add album</button></form><div id="albumList" class="album-list"></div></div>
 </div><h3>Uploaded media</h3><div id="mediaList" class="media-list"></div></section>
 <section class="admin-panel claude-panel">
-<h2>Claude Creative Studio</h2>
-<p class="help-text">Create brand-ready captions, Story campaigns, booking replies, quotation copy and marketing plans. Claude runs securely on the server; your API key is never sent to the browser. Anthropic API usage may be billed to your account.</p>
+<h2>Creative Studio — Free</h2>
+<p class="help-text">Create ready-to-use captions, Story campaigns, booking replies, quotation drafts and marketing plans using built-in templates. No API key, external AI service or payment is required.</p>
 <form id="claudeForm" class="stack-form">
 <label>Creative task<select id="claudeTask"><option value="instagram_caption">Instagram caption + hashtags</option><option value="story_campaign">Instagram Story booking campaign</option><option value="booking_reply">Client booking reply</option><option value="quotation_copy">Quotation / package wording</option><option value="marketing_plan">7-day marketing plan</option></select></label>
 <label>Output language<select id="claudeLanguage"><option>English</option><option>Telugu</option><option>English + Telugu</option></select></label>
 <label>Creative direction<select id="claudeTone"><option>Premium and elegant</option><option>Warm and emotional</option><option>Modern and creative</option><option>Direct and conversion-focused</option></select></label>
 <label>Your brief<textarea id="claudeBrief" rows="4" maxlength="1800" required placeholder="Example: Create a premium Instagram Story to promote wedding photography bookings for December. Highlight our cinematic films and natural candid moments."></textarea></label>
 <label>Additional confirmed details (optional)<textarea id="claudeContext" rows="3" maxlength="800" placeholder="Add confirmed prices, dates, deliverables, contact details or offer conditions. Do not add passwords or private client information."></textarea></label>
-<button id="claudeGenerate" type="submit">Generate with Claude</button>
+<button id="claudeGenerate" type="submit">Create free draft</button>
 </form>
 <div class="claude-output-heading"><h3>Generated content</h3><button id="claudeCopy" type="button" class="button-secondary" disabled>Copy content</button></div>
 <pre id="claudeOutput" class="claude-output" aria-live="polite">Your generated content will appear here.</pre>
