@@ -180,27 +180,38 @@ $("printQr").addEventListener("click",()=>{
   win.document.write("<!doctype html><html><head><title>Event QR</title><style>body{font-family:Arial,sans-serif;text-align:center;padding:48px;color:#172033}h1{font-family:Georgia,serif;font-weight:400}img{width:300px;height:300px;object-fit:contain;margin:30px auto}p{color:#687386;letter-spacing:2px}@media print{button{display:none}}</style></head><body><p>RAMESH PHOTOGRAPHY</p><h1>"+title+"</h1><img src='"+src+"' alt='Event QR code'><h2>"+code+"</h2><p>SCAN TO VIEW & DOWNLOAD PHOTOS</p><button onclick='window.print()'>Print</button></body></html>");
   win.document.close();
 });
-$("claudeForm").addEventListener("submit",async event=>{
+function makeCreativeDraft({task,language,tone,brief,context}){
+  const details=context? "\n\nConfirmed details: "+context : "";
+  const brand="Ramesh Photography";
+  const english={
+    instagram_caption: "INSTAGRAM CAPTION\n\n"+brief+"\n\nFor moments that deserve to be remembered beautifully, choose "+brand+".\nFor bookings and enquiries, send us a DM.\n\n#RameshPhotography #SouthIndianWedding #WeddingPhotography #CandidWeddingPhotography #WeddingStories",
+    story_campaign: "INSTAGRAM STORY CAMPAIGN\n\nFrame 1 — HOOK\nVisual: A strong candid wedding moment.\nText: Your once-in-a-lifetime moments deserve to be remembered.\n\nFrame 2 — EXPERIENCE\nVisual: A sequence of details, emotions and celebrations.\nText: Real emotions. Beautiful details. Timeless memories.\n\nFrame 3 — BRAND\nVisual: A clean portfolio highlight.\nText: "+brand+"\n\nFrame 4 — CALL TO ACTION\nVisual: A simple booking card.\nText: Now accepting enquiries. DM us to check your date.",
+    booking_reply: "CLIENT ENQUIRY REPLY\n\nHello! Thank you for considering "+brand+" for your special occasion. We would be happy to understand your requirements. Please share your event date, venue, event functions and the photography/video services you are looking for. We can then discuss the suitable package and availability. Looking forward to hearing from you.",
+    quotation_copy: "PHOTOGRAPHY QUOTATION\n\nPrepared by: "+brand+"\n\nEvent / requirements:\n"+brief+"\n\nConfirmed details:\n"+(context||"To be confirmed with the client.")+"\n\nFinal pricing, deliverables, coverage hours, delivery timeline and booking advance should be confirmed in writing before acceptance. No unconfirmed service or price is included in this draft.",
+    marketing_plan: "7-DAY MARKETING PLAN — "+brand+"\n\nDay 1: Publish a strong wedding portfolio image with a short story behind the moment.\nDay 2: Share a 3–5 frame Story showing candid moments and details.\nDay 3: Post a short behind-the-scenes Reel from a real event.\nDay 4: Share a client FAQ about coverage, deliverables or booking.\nDay 5: Publish a carousel featuring one event from preparation to celebration.\nDay 6: Post a clear booking-enquiry Story with a DM call-to-action.\nDay 7: Review reach, saves, shares and genuine enquiries; repeat the best-performing format."
+  };
+  const telugu={
+    instagram_caption: "ఇన్‌స్టాగ్రామ్ క్యాప్షన్\n\n"+brief+"\n\nమీ జీవితంలోని ప్రత్యేక క్షణాలను అందంగా భద్రపరచడానికి "+brand+".\nబుకింగ్ వివరాల కోసం DM చేయండి.\n\n#RameshPhotography #WeddingPhotography #SouthIndianWedding #CandidPhotography",
+    story_campaign: "ఇన్‌స్టాగ్రామ్ స్టోరీ క్యాంపెయిన్\n\nఫ్రేమ్ 1 — ఆకట్టుకునే క్షణం\nవిజువల్: అందమైన క్యాండిడ్ వెడ్డింగ్ ఫోటో.\nటెక్స్ట్: మీ జీవితంలోని ప్రత్యేక క్షణాలు ఎప్పటికీ గుర్తుండాలి.\n\nఫ్రేమ్ 2 — మా పని\nవిజువల్: వేడుకలోని భావోద్వేగాలు, వివరాలు.\nటెక్స్ట్: నిజమైన భావాలు. అందమైన జ్ఞాపకాలు.\n\nఫ్రేమ్ 3 — బ్రాండ్\nవిజువల్: బెస్ట్ పోర్ట్‌ఫోలియో.\nటెక్స్ట్: "+brand+"\n\nఫ్రేమ్ 4 — బుకింగ్\nటెక్స్ట్: బుకింగ్ వివరాల కోసం DM చేయండి.",
+    booking_reply: "క్లయింట్ ఎంక్వైరీకి సమాధానం\n\nనమస్కారం! మీ ప్రత్యేక వేడుక కోసం "+brand+" ను సంప్రదించినందుకు ధన్యవాదాలు. మీ ఈవెంట్ తేదీ, వేదిక, ఎన్ని ఫంక్షన్లు ఉన్నాయి, ఫోటోగ్రఫీ లేదా వీడియోలో ఏ సేవలు కావాలో తెలియజేయండి. వాటి ఆధారంగా ప్యాకేజీ మరియు అందుబాటును చర్చిద్దాం. ధన్యవాదాలు!",
+    quotation_copy: "ఫోటోగ్రఫీ కొటేషన్\n\nసంస్థ: "+brand+"\n\nఈవెంట్ / అవసరాలు:\n"+brief+"\n\nధృవీకరించిన వివరాలు:\n"+(context||"క్లయింట్‌తో నిర్ధారించాలి.")+"\n\nధరలు, డెలివరబుల్స్, కవరేజ్ సమయం, ఫోటోలు/వీడియో డెలివరీ గడువు, అడ్వాన్స్ వివరాలను క్లయింట్‌తో రాతపూర్వకంగా నిర్ధారించిన తర్వాతే ఫైనల్ చేయాలి.",
+    marketing_plan: "7 రోజుల మార్కెటింగ్ ప్లాన్ — "+brand+"\n\n1వ రోజు: బెస్ట్ వెడ్డింగ్ ఫోటోతో చిన్న కథను పోస్ట్ చేయండి.\n2వ రోజు: క్యాండిడ్ మూమెంట్స్‌తో 3–5 స్టోరీ ఫ్రేమ్స్ పెట్టండి.\n3వ రోజు: నిజమైన ఈవెంట్ బిహైండ్-ది-సీన్స్ Reel షేర్ చేయండి.\n4వ రోజు: కవరేజ్ లేదా డెలివరీ గురించి ఒక FAQ పోస్ట్ చేయండి.\n5వ రోజు: ఒక ఈవెంట్‌ను చూపించే ఫోటో క్యారసెల్ పోస్ట్ చేయండి.\n6వ రోజు: బుకింగ్ ఎంక్వైరీ కోసం స్పష్టమైన DM స్టోరీ పెట్టండి.\n7వ రోజు: రీచ్, సేవ్స్, షేర్స్, నిజమైన ఎంక్వైరీలను పరిశీలించి మంచి ఫలితమిచ్చిన కంటెంట్‌ను మళ్లీ చేయండి."
+  };
+  const en=english[task],te=telugu[task];
+  let result=language==="Telugu"?te:language==="English + Telugu"?en+"\n\n——————————\n\n"+te:en;
+  if(details)result+="\n\n"+(language==="Telugu"?"అదనపు ధృవీకరించిన వివరాలు: ":"Additional confirmed details: ")+context;
+  result+="\n\n"+(language==="Telugu"?"గమనిక: ప్రచురించే ముందు తేదీలు, ధరలు, సేవలు మరియు అందుబాటును నిర్ధారించండి.":"Note: Verify dates, prices, services and availability before publishing.");
+  return result;
+}
+$("claudeForm").addEventListener("submit",event=>{
   event.preventDefault();
-  const button=$("claudeGenerate"),output=$("claudeOutput"),copy=$("claudeCopy");
-  button.disabled=true;button.textContent="Creating…";copy.disabled=true;output.textContent="Claude is preparing your content…";
-  try{
-    const data=await api("/api/admin/ai/assistant",{method:"POST",body:JSON.stringify({
-      task:$("claudeTask").value,
-      language:$("claudeLanguage").value,
-      tone:$("claudeTone").value,
-      brief:$("claudeBrief").value,
-      context:$("claudeContext").value
-    })});
-    output.textContent=data.text;
-    copy.disabled=false;
-    say("Claude content generated. Review all prices, dates and business details before publishing.");
-  }catch(err){
-    output.textContent=err.message;
-    say(err.message,true);
-  }finally{
-    button.disabled=false;button.textContent="Generate with Claude";
-  }
+  const output=$("claudeOutput"),copy=$("claudeCopy");
+  const brief=$("claudeBrief").value.trim();
+  if(!brief){say("Please enter your brief.",true);return;}
+  const data={task:$("claudeTask").value,language:$("claudeLanguage").value,tone:$("claudeTone").value,brief,context:$("claudeContext").value.trim()};
+  output.textContent=makeCreativeDraft(data);
+  copy.disabled=false;
+  say("Draft created using free built-in templates. Review all details before publishing.");
 });
 $("claudeCopy").addEventListener("click",async()=>{
   const value=$("claudeOutput").textContent||"";
