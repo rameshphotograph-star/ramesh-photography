@@ -5,6 +5,8 @@ import { ensureSupportTables } from "../../_lib/schema.js";
 import { githubOAuthConfigured, githubOAuthStarted } from "../../_lib/github-oauth.js";
 
 export async function onRequestPost({ request, env }) {
+  // Production must use the allowlisted GitHub OAuth flow only. Never expose the Preview password/bootstrap fallback on the production branch.
+  if (env.CF_PAGES_BRANCH === "main") return error("Password login and bootstrap are disabled in Production. Use the approved GitHub sign-in.", 403);
   if (githubOAuthStarted(env)) return error(githubOAuthConfigured(env) ? "Password login is disabled. Use the approved GitHub sign-in." : "GitHub sign-in configuration is incomplete.", 403);
   if (!isSameOriginRequest(request)) return error("Cross-origin request blocked.", 403);
   try {
