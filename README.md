@@ -139,15 +139,4 @@ Preview deployment refresh: redeploy the feature branch after updating the CLOUD
 - Production remains blocked until the OAuth App callback is switched to the Production pages.dev URL, Production OAuth secrets and D1 binding/backups are verified, and a Production smoke test is completed.
 
 
-## Claude Creative Studio (optional, metered API)
-
-The authenticated Admin dashboard includes a Claude-powered creative assistant for Instagram captions, Story booking campaigns, booking replies, quotation wording and 7-day marketing plans. The endpoint is protected by the existing admin session and same-origin request check. The Anthropic key is used only by the Pages Function and is never exposed to browser JavaScript.
-
-Set these in Cloudflare Pages → Settings → Variables and secrets:
-- `ANTHROPIC_API_KEY` (Secret; create it in the Anthropic Console)
-- `CLAUDE_MODEL` (Text; optional; defaults to `claude-sonnet-5-5`)
-- `ANTHROPIC_WORKSPACE_ID` (Text; optional; required only for an API key that is not scoped to one workspace)
-
-Add the secret separately to Preview first. Claude generation sends a request to Anthropic and may incur usage charges under the user's Anthropic account. No Claude request is made until the signed-in Admin presses **Generate with Claude**. Never place the API key in GitHub, HTML or browser JavaScript. See the official [Claude API authentication](https://platform.claude.com/docs/en/manage-claude/authentication) and [API overview](https://platform.claude.com/docs/en/api/overview).
-
-The assistant is an optional content tool, not an autonomous publishing or messaging system. Review generated prices, dates, inclusions and client details before sending or publishing.
+## Creative Studio (free built-in templates)\n\nThe Admin dashboard includes a no-cost template assistant for Instagram captions, Story campaigns, booking replies, quotation wording and 7-day marketing plans. It runs locally in the browser using built-in English and Telugu templates. It does not call Anthropic or any other AI API, and it requires no API key, Cloudflare secret, prepaid credits or usage billing. The output is a structured first draft rather than AI-generated custom writing; review and edit all details before publishing.\n
