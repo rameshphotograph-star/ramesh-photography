@@ -137,3 +137,17 @@ Preview deployment refresh: redeploy the feature branch after updating the CLOUD
 - Once any GitHub OAuth variable is configured, all Admin sessions must be linked to allowlisted GitHub ID 340888996; incomplete OAuth configuration fails closed.
 - Production must use GitHub-only Admin sign-in. The Preview 100,000-iteration PBKDF2 fallback is below current OWASP guidance and is explicitly not Production-approved.
 - Production remains blocked until the OAuth App callback is switched to the Production pages.dev URL, Production OAuth secrets and D1 binding/backups are verified, and a Production smoke test is completed.
+
+
+## Claude Creative Studio (optional, metered API)
+
+The authenticated Admin dashboard includes a Claude-powered creative assistant for Instagram captions, Story booking campaigns, booking replies, quotation wording and 7-day marketing plans. The endpoint is protected by the existing admin session and same-origin request check. The Anthropic key is used only by the Pages Function and is never exposed to browser JavaScript.
+
+Set these in Cloudflare Pages → Settings → Variables and secrets:
+- `ANTHROPIC_API_KEY` (Secret; create it in the Anthropic Console)
+- `CLAUDE_MODEL` (Text; optional; defaults to `claude-sonnet-4-6`)
+- `ANTHROPIC_WORKSPACE_ID` (Text; optional; required only for an API key that is not scoped to one workspace)
+
+Add the secret separately to Preview first. Claude generation sends a request to Anthropic and may incur usage charges under the user's Anthropic account. No Claude request is made until the signed-in Admin presses **Generate with Claude**. Never place the API key in GitHub, HTML or browser JavaScript. See the official [Claude API authentication](https://platform.claude.com/docs/en/manage-claude/authentication) and [API overview](https://platform.claude.com/docs/en/api/overview).
+
+The assistant is an optional content tool, not an autonomous publishing or messaging system. Review generated prices, dates, inclusions and client details before sending or publishing.
