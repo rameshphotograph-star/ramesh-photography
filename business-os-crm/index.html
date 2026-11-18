@@ -92,7 +92,8 @@ document.getElementById("ownerLoginForm").addEventListener("submit",async e=>{
   else{document.body.classList.add("authed");document.getElementById("ownerPassword").value="";}
  }catch(ex){err.textContent=ex.message;}finally{btn.disabled=false;}
 });
-async function ownerLogout(){try{await fetch('/api/auth/logout',{method:'POST',credentials:'same-origin'});}catch(e){}document.body.classList.remove('authed');}\nasync function checkOwnerSession(){try{const r=await fetch("/api/auth/me",{credentials:"same-origin",cache:"no-store"});if(r.ok){document.body.classList.add("authed");return;}}catch(e){}document.body.classList.remove("authed");}
+async function ownerLogout(){try{await fetch('/api/auth/logout',{method:'POST',credentials:'same-origin'});}catch(e){}document.body.classList.remove('authed');}
+async function checkOwnerSession(){try{const r=await fetch("/api/auth/me",{credentials:"same-origin",cache:"no-store"});if(r.ok){document.body.classList.add("authed");return;}}catch(e){}document.body.classList.remove("authed");}
 
 const stages=['New','Contacted','Qualified','Quoted','Follow-up','Won','Lost'];
 const steps=['Pre-event call','Shot list prepared','Crew confirmed','Shoot completed','Files backed up','Culling completed','Editing completed','Client proof shared','Album approved','Final delivery completed'];
