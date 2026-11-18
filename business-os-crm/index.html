@@ -30,9 +30,9 @@ body.authed #authGate{display:none}
 </form><button class="auth-switch" id="authMode" type="button">First time? Set up Owner account</button>
 </div></div>
 
-<header class="top"><small>Ramesh Photography · Business OS v0.2</small><h1>CRM & Booking Manager</h1><p>Enquiries · Follow-ups · Bookings · Payments · Delivery</p></header>
+<header class="top"><small>Ramesh Photography · Business OS v0.2</small><h1>CRM & Booking Manager</h1><p>Enquiries · Follow-ups · Bookings · Payments · Delivery</p><button class="secondary" style="margin-top:10px" onclick="ownerLogout()">Sign out</button></header>
 <main class="wrap">
-<div class="notice"><b>Private local prototype:</b> Records stay in this browser on this device. Use Export Backup regularly. Do not enter real client details until secure login, staff permissions and cloud backup are implemented. No messages or payments are sent from this app.</div>
+<div class="notice"><b>Owner access protected:</b> Sign-in is verified by the server using Cloudflare D1. CRM enquiry and booking records are still stored in this browser only; cloud data sync and staff access are not enabled yet. Export backups regularly.</div>
 <nav class="tabs" aria-label="App sections"><button class="active" data-tab="overview">Overview</button><button data-tab="enquiries">Enquiries</button><button data-tab="bookings">Bookings</button><button data-tab="workflow">Shoot workflow</button><button data-tab="backup">Backup</button></nav>
 <section id="overview" class="panel active">
 <div class="grid">
@@ -92,7 +92,7 @@ document.getElementById("ownerLoginForm").addEventListener("submit",async e=>{
   else{document.body.classList.add("authed");document.getElementById("ownerPassword").value="";}
  }catch(ex){err.textContent=ex.message;}finally{btn.disabled=false;}
 });
-async function checkOwnerSession(){try{const r=await fetch("/api/auth/me",{credentials:"same-origin",cache:"no-store"});if(r.ok){document.body.classList.add("authed");return;}}catch(e){}document.body.classList.remove("authed");}
+async function ownerLogout(){try{await fetch('/api/auth/logout',{method:'POST',credentials:'same-origin'});}catch(e){}document.body.classList.remove('authed');}\nasync function checkOwnerSession(){try{const r=await fetch("/api/auth/me",{credentials:"same-origin",cache:"no-store"});if(r.ok){document.body.classList.add("authed");return;}}catch(e){}document.body.classList.remove("authed");}
 
 const stages=['New','Contacted','Qualified','Quoted','Follow-up','Won','Lost'];
 const steps=['Pre-event call','Shot list prepared','Crew confirmed','Shoot completed','Files backed up','Culling completed','Editing completed','Client proof shared','Album approved','Final delivery completed'];
