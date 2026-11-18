@@ -6,9 +6,30 @@
 <title>Ramesh Photography | CRM & Booking</title>
 <style>
 :root{--navy:#101827;--ink:#172033;--muted:#667085;--line:#e5e9f0;--bg:#f3f5f8;--gold:#c49a54;--green:#16794b;--red:#b42318;--blue:#315cbb}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}.top{background:var(--navy);color:#fff;padding:22px max(16px,calc((100% - 1120px)/2))}.top small{color:#c5cedb;letter-spacing:.1em;text-transform:uppercase}.top h1{margin:4px 0;font-size:24px}.top p{margin:0;color:#c5cedb}.wrap{max-width:1120px;margin:auto;padding:16px}.notice{background:#fff8e8;border:1px solid #f1dfb8;padding:12px;border-radius:12px;color:#76531b;margin-bottom:14px}.tabs{display:flex;gap:8px;overflow:auto;margin-bottom:15px}.tabs button{white-space:nowrap;background:#fff;border:1px solid var(--line);padding:10px 14px;border-radius:999px;font-weight:650;color:var(--ink)}.tabs button.active{background:var(--navy);color:#fff}.panel{display:none}.panel.active{display:block}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.card{background:#fff;border:1px solid var(--line);border-radius:15px;padding:15px;box-shadow:0 2px 8px #10182808;margin-bottom:12px}.metric small,.muted{color:var(--muted)}.metric strong{display:block;font-size:25px;margin-top:4px}.row{display:flex;gap:12px;flex-wrap:wrap}.row>*{flex:1;min-width:180px}label{display:block;font-size:13px;color:var(--muted);margin:10px 0 5px}input,select,textarea{width:100%;padding:11px;border:1px solid #d5dbe5;border-radius:9px;font:inherit;background:#fff;color:var(--ink)}textarea{min-height:76px;resize:vertical}button.primary{background:var(--navy);color:#fff;border:0;border-radius:9px;padding:11px 15px;font-weight:650;margin-top:12px}button.secondary{background:#fff;border:1px solid var(--line);border-radius:9px;padding:9px 12px}button.danger{background:#fff;color:var(--red);border:1px solid #efc5c1;border-radius:9px;padding:8px 11px}.item{padding:12px 0;border-bottom:1px solid var(--line)}.item:last-child{border:0}.item strong{display:block}.pill{display:inline-block;background:#eef2f7;color:#344054;border-radius:99px;padding:3px 9px;font-size:12px}.pill.green{background:#eaf7ef;color:var(--green)}.pill.red{background:#fff0ef;color:var(--red)}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.empty{padding:24px;text-align:center;color:var(--muted)}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.foot{font-size:12px;color:var(--muted);margin:16px 2px}@media(max-width:720px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.two{grid-template-columns:1fr}.wrap{padding:12px}.top{padding:18px 16px}.metric strong{font-size:21px}}
+
+body:not(.authed) .top,body:not(.authed) main{display:none!important}
+#authGate{min-height:100vh;display:grid;place-items:center;padding:22px;background:#f3f5f8}
+body.authed #authGate{display:none}
+.auth-card{width:min(100%,420px);background:#fff;border:1px solid #e5e9f0;border-radius:18px;padding:24px;box-shadow:0 12px 40px #10182812}
+.auth-card h1{margin:0 0 6px;font-size:25px}
+.auth-card p{color:#667085}
+.auth-card button{width:100%;cursor:pointer}
+.auth-error{color:#b42318;min-height:24px;font-size:13px}
+.auth-switch{background:none;border:0;color:#315cbb;text-decoration:underline;padding:10px}
 </style>
 </head>
 <body>
+<div id="authGate"><div class="auth-card">
+<div style="color:#c49a54;font-weight:700;letter-spacing:.08em">RAMESH PHOTOGRAPHY</div>
+<h1 id="authTitle">Owner Login</h1><p id="authSubtitle">Sign in to access your private CRM.</p>
+<form id="ownerLoginForm">
+<label>Email</label><input id="ownerEmail" type="email" value="rameshphotograph@gmail.com" autocomplete="username" required>
+<div id="loginPasswordWrap"><label>Password</label><input id="ownerPassword" type="password" autocomplete="current-password" required></div>
+<div id="setupFields" hidden><label>Owner display name</label><input id="ownerName" maxlength="80" value="Ramesh Photography Owner"><label>Setup key</label><input id="ownerSetupKey" type="password" autocomplete="off"><p class="muted">One-time setup key configured in Cloudflare Pages secrets.</p></div>
+<button class="primary" id="authSubmit" type="submit">Sign in</button><div class="auth-error" id="authError" role="alert"></div>
+</form><button class="auth-switch" id="authMode" type="button">First time? Set up Owner account</button>
+</div></div>
+
 <header class="top"><small>Ramesh Photography · Business OS v0.2</small><h1>CRM & Booking Manager</h1><p>Enquiries · Follow-ups · Bookings · Payments · Delivery</p></header>
 <main class="wrap">
 <div class="notice"><b>Private local prototype:</b> Records stay in this browser on this device. Use Export Backup regularly. Do not enter real client details until secure login, staff permissions and cloud backup are implemented. No messages or payments are sent from this app.</div>
@@ -46,6 +67,33 @@
 </main>
 <script>
 const KEY='rp_crm_v02_local';
+let authMode="login";
+function setAuthMode(mode){
+ authMode=mode;const setup=mode==="setup";
+ document.getElementById("authTitle").textContent=setup?"Set up Owner account":"Owner Login";
+ document.getElementById("authSubtitle").textContent=setup?"Create the single authorized Owner account.":"Sign in to access your private CRM.";
+ document.getElementById("setupFields").hidden=!setup;
+ document.getElementById("loginPasswordWrap").querySelector("label").textContent=setup?"Create password (14+ characters)":"Password";
+ document.getElementById("ownerPassword").autocomplete=setup?"new-password":"current-password";
+ document.getElementById("authSubmit").textContent=setup?"Create Owner account":"Sign in";
+ document.getElementById("authMode").textContent=setup?"Back to Owner Login":"First time? Set up Owner account";
+ document.getElementById("authError").textContent="";
+}
+document.getElementById("authMode").addEventListener("click",()=>setAuthMode(authMode==="login"?"setup":"login"));
+document.getElementById("ownerLoginForm").addEventListener("submit",async e=>{
+ e.preventDefault();const err=document.getElementById("authError"),btn=document.getElementById("authSubmit");err.textContent="";btn.disabled=true;
+ try{
+  const payload={email:document.getElementById("ownerEmail").value,password:document.getElementById("ownerPassword").value};
+  let url="/api/auth/login";
+  if(authMode==="setup"){url="/api/auth/bootstrap";payload.name=document.getElementById("ownerName").value;payload.setupKey=document.getElementById("ownerSetupKey").value;}
+  const r=await fetch(url,{method:"POST",headers:{"content-type":"application/json"},credentials:"same-origin",body:JSON.stringify(payload)});
+  const data=await r.json();if(!r.ok)throw new Error(data.error||"Unable to continue");
+  if(authMode==="setup"){setAuthMode("login");document.getElementById("authError").textContent="Owner account created. Sign in now.";document.getElementById("ownerPassword").value="";}
+  else{document.body.classList.add("authed");document.getElementById("ownerPassword").value="";}
+ }catch(ex){err.textContent=ex.message;}finally{btn.disabled=false;}
+});
+async function checkOwnerSession(){try{const r=await fetch("/api/auth/me",{credentials:"same-origin",cache:"no-store"});if(r.ok){document.body.classList.add("authed");return;}}catch(e){}document.body.classList.remove("authed");}
+
 const stages=['New','Contacted','Qualified','Quoted','Follow-up','Won','Lost'];
 const steps=['Pre-event call','Shot list prepared','Crew confirmed','Shoot completed','Files backed up','Culling completed','Editing completed','Client proof shared','Album approved','Final delivery completed'];
 let db=load();
@@ -72,5 +120,6 @@ function exportBackup(){const blob=new Blob([JSON.stringify({app:'RameshPhotogra
 function restoreBackup(e){const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const x=JSON.parse(reader.result);if(x.app!=='RameshPhotographyCRM'||x.version!==2||!Array.isArray(x.data?.enquiries)||!Array.isArray(x.data?.bookings))throw Error('Invalid backup');if(!confirm('Restore this backup? Current local CRM data will be replaced.'))return;db=x.data;save();document.getElementById('backupMsg').textContent='Backup restored on this device.'}catch(err){alert('Could not restore: '+err.message)}e.target.value=''};reader.readAsText(file)}
 function clearAll(){if(confirm('Permanently delete all CRM records saved in this browser? Export a backup first if needed.')){db={enquiries:[],bookings:[]};save();document.getElementById('backupMsg').textContent='All local CRM records deleted.'}}
 renderAll();
+checkOwnerSession();
 </script>
 </body></html>
