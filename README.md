@@ -70,6 +70,9 @@ Use the same Cloudinary account credentials only if you intend to store Preview 
 
 ## RP CRM database foundation
 
+The first owner-facing UI is available at `/crm.html` after Admin sign-in. The Admin dashboard links to it. Its authenticated API is `/api/admin/crm/summary`, `/enquiries`, `/bookings`, and `/payments`; every request uses the existing Admin session and owner-scoped D1 queries. Booking advances are recorded as payment rows, and later payments are rejected if they exceed the remaining booking balance. Cancelled bookings are excluded from financial summary totals.
+
+
 The separate RP CRM module uses the same Cloudflare D1 database as the event-delivery website, but its records are stored in additive `crm_*` tables. The first migration is `migrations/0005_rp_crm.sql` and creates:
 - `crm_enquiries` for customer enquiries, follow-ups, quotations and lead status
 - `crm_bookings` for confirmed/tentative photography bookings and event details
