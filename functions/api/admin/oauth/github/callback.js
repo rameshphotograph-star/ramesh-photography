@@ -89,6 +89,9 @@ export async function onRequestGet({ request, env }) {
     const emails = await githubJson("https://api.github.com/user/emails", tokenData.access_token);
     const email = primaryVerifiedGithubEmail(emails);
     if (!email) return failure(request, "Your GitHub account needs a verified primary email address.");
+    if (email !== "rameshphotograph@gmail.com") {
+      return failure(request, "The verified primary email on this GitHub account does not match the approved Ramesh Photography owner email.");
+    }
 
     if (!env.DB) return failure(request, "Admin database is unavailable.");
     await ensureSupportTables(env.DB);
