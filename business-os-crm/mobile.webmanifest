@@ -1,0 +1,15 @@
+{
+  "id": "/mobile.html",
+  "name": "Ramesh Photography CRM",
+  "short_name": "RP CRM",
+  "description": "Private mobile CRM for enquiries, bookings and payments",
+  "start_url": "/mobile.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f3f5f8",
+  "theme_color": "#101827",
+  "icons": [
+    {"src": "/icons/app-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"}
+  ]
+}
