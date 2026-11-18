@@ -4,6 +4,7 @@ import { cookieValue, sessionCookie } from "../../../../_lib/auth.js";
 import { ensureSupportTables } from "../../../../_lib/schema.js";
 import {
   ALLOWED_GITHUB_USER_ID,
+  ALLOWED_OWNER_EMAIL,
   GITHUB_STATE_COOKIE,
   GITHUB_VERIFIER_COOKIE,
   clearOauthCookie,
@@ -89,7 +90,7 @@ export async function onRequestGet({ request, env }) {
     const emails = await githubJson("https://api.github.com/user/emails", tokenData.access_token);
     const email = primaryVerifiedGithubEmail(emails);
     if (!email) return failure(request, "Your GitHub account needs a verified primary email address.");
-    if (email !== "rameshphotograph@gmail.com") {
+    if (email !== ALLOWED_OWNER_EMAIL) {
       return failure(request, "The verified primary email on this GitHub account does not match the approved Ramesh Photography owner email.");
     }
 
