@@ -15,7 +15,18 @@ class MigrationTests(unittest.TestCase):
     def setUp(self):
         self.db = sqlite3.connect(":memory:")
         self.db.execute("PRAGMA foreign_keys = ON")
-        for filename in MIGRATIONS:
+        first = (ROOT / "migrations" / MIGRATIONS[0]).read_text(encoding="utf-8")
+        self.db.executescript(first)
+        admin_id = self.db.execute(
+            "INSERT INTO admins (name,email,password_hash) VALUES (?,?,?)",
+            ("Owner", "owner@example.com", "test-hash")
+        ).lastrowid
+        self.db.execute(
+            "INSERT INTO events (admin_id,event_name,event_code) VALUES (?,?,?)",
+            (admin_id, "Existing wedding", "EXIST001")
+        )
+        self.db.commit()
+        for filename in MIGRATIONS[1:]:
             sql = (ROOT / "migrations" / filename).read_text(encoding="utf-8")
             self.db.executescript(sql)
 
@@ -36,18 +47,9 @@ class MigrationTests(unittest.TestCase):
         self.assertTrue(expected.issubset(tables))
 
     def test_existing_website_records_survive_additive_migrations(self):
-        admin_id = self.db.execute(
-            "INSERT INTO admins (name,email,password_hash) VALUES (?,?,?)",
-            ("Owner", "owner@example.com", "test-hash")
-        ).lastrowid
-        event_id = self.db.execute(
-            "INSERT INTO events (admin_id,event_name,event_code) VALUES (?,?,?)",
-            (admin_id, "Test wedding", "TEST001")
-        ).lastrowid
-        self.db.commit()
         self.assertEqual(
-            self.db.execute("SELECT event_name FROM events WHERE id=?", (event_id,)).fetchone()[0],
-            "Test wedding"
+            self.db.execute("SELECT event_name FROM events WHERE event_code='EXIST001'").fetchone()[0],
+            "Existing wedding"
         )
         self.assertEqual(
             self.db.execute("SELECT email_hash FROM login_attempts LIMIT 1").fetchone(),
