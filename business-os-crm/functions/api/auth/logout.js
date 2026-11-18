@@ -1,0 +1,2 @@
+import {json,sameOrigin,getCookie,clearCookie,sha256} from "../../_lib/auth.js";
+export async function onRequestPost({request,env}){if(!sameOrigin(request))return json({error:"Request origin not allowed"},403);const token=getCookie(request);if(token&&env.DB)await env.DB.prepare("DELETE FROM crm_sessions WHERE token_hash=?").bind(await sha256(token)).run();return json({success:true},200,{"set-cookie":clearCookie()})}
