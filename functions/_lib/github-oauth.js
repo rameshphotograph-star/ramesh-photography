@@ -1,6 +1,7 @@
 import { randomToken } from "./crypto.js";
 
 export const ALLOWED_GITHUB_USER_ID = "340888996";
+export const ALLOWED_OWNER_EMAIL = "rameshphotograph@gmail.com";
 export const GITHUB_STATE_COOKIE = "rp_github_oauth_state";
 export const GITHUB_VERIFIER_COOKIE = "rp_github_oauth_verifier";
 export const GITHUB_CALLBACK_PATH = "/api/admin/oauth/github/callback";
