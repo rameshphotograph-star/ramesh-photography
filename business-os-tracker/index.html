@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101827"><title>Ramesh Photography | Business & Debt Manager</title>
+<style>
+:root{--bg:#f3f5f8;--card:#fff;--ink:#172033;--muted:#667085;--line:#e5e9f0;--navy:#101827;--gold:#c49a54;--green:#16794b;--red:#b42318;--blue:#315cbb}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}.top{background:var(--navy);color:white;padding:22px max(18px,calc((100% - 1100px)/2)) 18px}.top small{color:#c5cedb;letter-spacing:.08em;text-transform:uppercase}.top h1{font-size:23px;margin:4px 0}.top p{margin:0;color:#c5cedb}.wrap{max-width:1100px;margin:auto;padding:16px}.tabs{display:flex;gap:8px;overflow:auto;margin:0 0 16px}.tabs button{white-space:nowrap;border:1px solid var(--line);background:white;color:var(--ink);padding:10px 14px;border-radius:999px;font-weight:600}.tabs button.active{background:var(--navy);color:white}.panel{display:none}.panel.active{display:block}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.card{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:16px;box-shadow:0 2px 8px #10182808}.metric small,.muted{color:var(--muted)}.metric strong{display:block;font-size:25px;margin-top:4px}.danger{color:var(--red)}.good{color:var(--green)}h2{font-size:19px;margin:0 0 12px}h3{font-size:16px;margin:0 0 10px}.row{display:flex;gap:12px;flex-wrap:wrap}.row>*{flex:1;min-width:180px}label{display:block;font-size:13px;color:var(--muted);margin:10px 0 5px}input,select,textarea{width:100%;padding:11px;border:1px solid #d5dbe5;border-radius:9px;font:inherit;background:white;color:var(--ink)}button.primary{background:var(--navy);color:white;border:0;border-radius:9px;padding:11px 15px;font-weight:650;margin-top:12px}button.secondary{background:white;border:1px solid var(--line);border-radius:9px;padding:10px 13px}button.warn{color:var(--red);background:#fff;border:1px solid #f1c7c3;border-radius:9px;padding:9px 12px}.item{padding:12px 0;border-bottom:1px solid var(--line)}.item:last-child{border:0}.item strong{display:block}.bar{height:9px;background:#e9edf3;border-radius:99px;overflow:hidden}.bar span{display:block;height:100%;background:var(--gold)}.notice{background:#fff8e8;border:1px solid #f1dfb8;padding:12px;border-radius:11px;color:#76531b}.goodbox{background:#edf8f1;border:1px solid #cce9d6;padding:12px;border-radius:11px;color:#17623e}.table{width:100%;border-collapse:collapse}.table td,.table th{text-align:left;padding:9px 7px;border-bottom:1px solid var(--line);font-size:14px}.table th{color:var(--muted);font-weight:600}.foot{color:var(--muted);font-size:12px;margin:18px 2px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}@media(max-width:700px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.wrap{padding:12px}.top{padding:18px 16px}.metric strong{font-size:21px}}@media(max-width:390px){.grid{grid-template-columns:1fr 1fr}}
+</style></head>
+<body>
+<header class="top"><small>Ramesh Photography</small><h1>Business & Debt Manager</h1><p>Track every booking. Protect every rupee. Build financial stability.</p></header>
+<main class="wrap">
+<nav class="tabs" aria-label="App sections"><button class="active" data-tab="home">Overview</button><button data-tab="entry">Add record</button><button data-tab="debts">Debts & EMI</button><button data-tab="goals">Season & goals</button><button data-tab="backup">Backup</button></nav>
+<section id="home" class="panel active">
+<div class="grid">
+<div class="card metric"><small>Total debt (starting)</small><strong id="debtMetric">₹9,00,000</strong></div>
+<div class="card metric"><small>This month's collections</small><strong id="collectionMetric">₹0</strong></div>
+<div class="card metric"><small>This month's business costs</small><strong id="costMetric">₹0</strong></div>
+<div class="card metric"><small>Reserve balance</small><strong id="reserveMetric">₹0</strong></div>
+</div>
+<div class="row" style="margin-top:12px">
+<div class="card"><h3>Monthly commitments</h3><div class="item">EMIs <strong>₹28,400</strong></div><div class="item">Family expenses <strong>₹15,000</strong></div><div class="item">Minimum before business costs & gold-loan interest <strong class="danger">₹43,400</strong></div></div>
+<div class="card"><h3>Current plan</h3><p>Peak wedding season: <b>March–June</b></p><p>Off-season: build editing, albums, prints and portrait work.</p><div class="notice">Muthoot Gold Loan ₹2,00,000: contact the branch urgently to confirm overdue interest, maturity and auction status. Do not assume the loan is safe until confirmed.</div></div>
+</div>
+<div class="card" style="margin-top:12px"><h2>Recent records</h2><div id="recent"><p class="muted">No records yet. Add your first collection or expense.</p></div></div>
+</section>
+<section id="entry" class="panel">
+<div class="card"><h2>Add a business record</h2><p class="muted">Record collections and costs separately. A client balance collected now is cash received, not a new booking's profit.</p>
+<form id="recordForm"><div class="row"><div><label>Date</label><input type="date" id="date" required></div><div><label>Record type</label><select id="type"><option value="collection">Client collection</option><option value="expense">Business expense</option><option value="pending">New pending client balance</option><option value="reserve">Reserve deposit</option><option value="debtpay">Extra debt payment</option></select></div></div>
+<div class="row"><div><label>Amount (₹)</label><input id="amount" type="number" min="1" step="1" required placeholder="e.g. 15000"></div><div><label>Client / purpose</label><input id="note" maxlength="100" placeholder="Wedding client, album, travel..."></div></div><button class="primary" type="submit">Save record</button></form></div>
+<div class="card" style="margin-top:12px"><h2>Daily accountability</h2><form id="taskForm"><label>Today's important action</label><input id="task" required placeholder="e.g. Follow up with 5 pending clients"><button class="primary">Add task</button></form><div id="tasks"></div></div>
+</section>
+<section id="debts" class="panel">
+<div class="card"><h2>Debt overview</h2><p>Starting total debt recorded: <b>₹9,00,000</b>. Update individual balances after checking statements; the list below is a starting estimate, not a verified lender statement.</p><div class="item">Muthoot Finance Gold Loan <strong>₹2,00,000</strong><span class="muted">Interest rate, overdue amount and maturity not yet confirmed.</span></div><div class="item">Other loans and dues <strong>₹7,00,000</strong><span class="muted">Breakdown and interest rates to be entered after verification.</span></div><div class="notice">Do not make extra repayments based on this estimate until all EMI amounts, interest rates, due dates and lender statements are verified. Keep scheduled EMIs current.</div>
+<form id="debtForm"><h3 style="margin-top:16px">Record a verified debt payment</h3><div class="row"><div><label>Payment amount (₹)</label><input id="debtAmount" type="number" min="1" required></div><div><label>Loan / lender</label><input id="lender" required placeholder="e.g. Muthoot / bank name"></div></div><button class="primary">Add payment record</button></form><div id="debtPayments"></div></div>
+</section>
+<section id="goals" class="panel">
+<div class="card"><h2>Seasonal savings goals</h2><p>Monthly commitments baseline: ₹43,400 (EMI + family costs), excluding business costs and Gold Loan interest.</p><div class="item">First reserve milestone <strong>₹10,000</strong></div><div class="item">One-month baseline reserve <strong>₹43,400</strong></div><div class="item">Two-month baseline reserve <strong>₹86,800</strong></div><div class="item">Three-month baseline reserve <strong>₹1,30,200</strong></div><p class="muted">These are milestones, not money currently saved. Deposit only what is genuinely left after business costs, scheduled EMI and family essentials.</p><div class="goodbox">March–June: focus on profitable bookings and reserve building. July–February: protect the reserve and use editing, albums, prints and portraits to support cash flow.</div></div>
+<div class="card" style="margin-top:12px"><h2>90-day focus checklist</h2><div id="checklist"></div></div>
+</section>
+<section id="backup" class="panel">
+<div class="card"><h2>Your data & privacy</h2><p>Records are saved only in this browser on this device using local storage. They are not synced to GitHub, a server, or another phone. Do not enter bank passwords, full account numbers or sensitive credentials.</p><div class="actions"><button class="primary" id="export">Download data backup</button><label class="secondary" style="display:inline-block;margin:0;cursor:pointer">Restore backup<input id="import" type="file" accept="application/json" style="display:none"></label><button class="warn" id="clear">Delete all app records</button></div><p class="muted">Back up regularly, especially before clearing browser data or changing phones.</p></div>
+</section>
+<p class="foot">Planning tool only — not accounting, tax or lender software. Confirm all balances and due dates with the relevant lender. Version 0.1 · Data stored locally on this device.</p>
+</main>
+<script>
+const KEY='ramesh-photography-manager-v1';
+const initial={records:[],tasks:[],debtPayments:[],checks:[false,false,false,false,false]};
+let data;try{data=JSON.parse(localStorage.getItem(KEY))||structuredClone(initial)}catch{data=structuredClone(initial)}
+const money=n=>'₹'+Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:0});
+const save=()=>localStorage.setItem(KEY,JSON.stringify(data));
+const el=id=>document.getElementById(id);
+el('date').value=new Date().toISOString().slice(0,10);
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===b.dataset.tab));}));
+function render(){
+const month=new Date().toISOString().slice(0,7), rows=data.records.filter(r=>r.date?.startsWith(month));
+const sum=t=>rows.filter(r=>r.type===t).reduce((a,r)=>a+Number(r.amount),0);
+el('collectionMetric').textContent=money(sum('collection'));el('costMetric').textContent=money(sum('expense'));
+el('reserveMetric').textContent=money(data.records.filter(r=>r.type==='reserve').reduce((a,r)=>a+Number(r.amount),0)-data.records.filter(r=>r.type==='reserveout').reduce((a,r)=>a+Number(r.amount),0));
+const paid=data.debtPayments.reduce((a,r)=>a+Number(r.amount),0);el('debtMetric').textContent=money(Math.max(0,900000-paid));
+el('recent').innerHTML=data.records.length?data.records.slice(-8).reverse().map(r=>'<div class="item"><strong>'+esc(r.note||r.type)+'</strong><span class="muted">'+esc(r.date)+' · '+esc(r.type)+'</span><b>'+money(r.amount)+'</b></div>').join(''):'<p class="muted">No records yet.</p>';
+el('tasks').innerHTML=data.tasks.map((t,i)=>'<div class="item"><label><input type="checkbox" data-task="'+i+'" '+(t.done?'checked':'')+' style="width:auto;margin-right:8px">'+esc(t.text)+'</label></div>').join('');
+el('debtPayments').innerHTML=data.debtPayments.map(r=>'<div class="item">'+esc(r.lender)+' · '+esc(r.date)+' <b>'+money(r.amount)+'</b></div>').join('');
+el('checklist').innerHTML=['Collect pending client balances and record each receipt','Confirm Muthoot outstanding, overdue interest, maturity and auction status','List every loan, EMI, due date and interest rate','Track all new bookings, collections and business costs','Build the first ₹10,000 reserve milestone'].map((t,i)=>'<div class="item"><label><input type="checkbox" data-check="'+i+'" '+(data.checks[i]?'checked':'')+' style="width:auto;margin-right:8px">'+t+'</label></div>').join('');
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+el('recordForm').addEventListener('submit',e=>{e.preventDefault();data.records.push({date:el('date').value,type:el('type').value,amount:Number(el('amount').value),note:el('note').value});save();e.target.reset();el('date').value=new Date().toISOString().slice(0,10);render();});
+el('taskForm').addEventListener('submit',e=>{e.preventDefault();data.tasks.push({text:el('task').value,done:false});save();e.target.reset();render();});
+el('debtForm').addEventListener('submit',e=>{e.preventDefault();data.debtPayments.push({date:new Date().toISOString().slice(0,10),amount:Number(el('debtAmount').value),lender:el('lender').value});save();e.target.reset();render();});
+document.addEventListener('change',e=>{if(e.target.dataset.task!==undefined){data.tasks[Number(e.target.dataset.task)].done=e.target.checked;save();}if(e.target.dataset.check!==undefined){data.checks[Number(e.target.dataset.check)]=e.target.checked;save();}});
+el('export').onclick=()=>{const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ramesh-photography-backup.json';a.click();URL.revokeObjectURL(a.href);};
+el('import').onchange=async e=>{try{const f=e.target.files[0];if(!f)return;const parsed=JSON.parse(await f.text());if(!Array.isArray(parsed.records)||!Array.isArray(parsed.tasks))throw Error('Invalid backup');data={...initial,...parsed};save();render();alert('Backup restored.');}catch{alert('Could not restore this backup file.');}};
+el('clear').onclick=()=>{if(confirm('Delete all records saved in this browser? Download a backup first if needed.')){data=structuredClone(initial);save();render();}};
+render();
+</script></body></html>
