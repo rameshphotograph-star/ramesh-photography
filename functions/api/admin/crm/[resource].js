@@ -116,13 +116,13 @@ export async function onRequestPost({ request, env, params }) {
     const amount = money(input.amount);
     const method = text(input.paymentMethod, 30) || "cash";
     if (!bookingId || !Number.isFinite(amount) || amount <= 0) return error("Choose a booking and enter a payment amount greater than zero.");
-    const booking = await env.DB.prepare("SELECT id,total_amount,status FROM crm_bookings WHERE id=? AND admin_id=?").bind(bookingId,admin.id).first();
-    if (!booking || booking.status === "cancelled") return error("Active booking not found.",404);
-    const already = await env.DB.prepare("SELECT COALESCE(SUM(amount),0) AS received FROM crm_payments WHERE booking_id=? AND admin_id=?").bind(bookingId,admin.id).first();
-    if (money(Number(already?.received || 0) + amount) > money(booking.total_amount)) return error("Payment exceeds the remaining booking balance.");
     const result = await env.DB.prepare(
-      "INSERT INTO crm_payments (admin_id,booking_id,amount,payment_method,reference,notes) VALUES (?,?,?,?,?,?)"
-    ).bind(admin.id,bookingId,amount,method,text(input.reference,120)||null,notes).run();
+      "INSERT INTO crm_payments (admin_id,booking_id,amount,payment_method,reference,notes) " +
+      "SELECT ?,b.id,?,?,?,? FROM crm_bookings b " +
+      "WHERE b.id=? AND b.admin_id=? AND b.status!='cancelled' " +
+      "AND COALESCE((SELECT SUM(p.amount) FROM crm_payments p WHERE p.booking_id=b.id AND p.admin_id=b.admin_id),0)+?<=b.total_amount"
+    ).bind(admin.id,amount,method,text(input.reference,120)||null,notes,bookingId,admin.id,amount).run();
+    if (!result.meta.changes) return error("Booking not found, cancelled, or payment exceeds the remaining balance.",409);
     return json({ success: true, id: result.meta.last_row_id }, 201);
   } catch (err) {
     return error(err.message || "Could not save CRM record. Confirm the CRM migration has been applied to this database.", 503);
