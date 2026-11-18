@@ -87,7 +87,7 @@ document.getElementById("ownerLoginForm").addEventListener("submit",async e=>{
   let url="/api/auth/login";
   if(authMode==="setup"){url="/api/auth/bootstrap";payload.name=document.getElementById("ownerName").value;payload.setupKey=document.getElementById("ownerSetupKey").value;}
   const r=await fetch(url,{method:"POST",headers:{"content-type":"application/json"},credentials:"same-origin",body:JSON.stringify(payload)});
-  const data=await r.json();if(!r.ok)throw new Error(data.error||"Unable to continue");
+  const raw=await r.text();let data;try{data=JSON.parse(raw)}catch{throw new Error("Server returned a non-JSON page (HTTP "+r.status+"). Check the latest Pages deployment and Functions logs.")}if(!r.ok)throw new Error(data.error||("Request failed (HTTP "+r.status+")"));
   if(authMode==="setup"){setAuthMode("login");document.getElementById("authError").textContent="Owner account created. Sign in now.";document.getElementById("ownerPassword").value="";}
   else{document.body.classList.add("authed");document.getElementById("ownerPassword").value="";}
  }catch(ex){err.textContent=ex.message;}finally{btn.disabled=false;}
