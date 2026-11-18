@@ -4,8 +4,12 @@ const REQUIRED_COLUMNS = {
   albums: ["id", "event_id", "album_name", "created_at"],
   photos: ["id", "event_id", "album_id", "object_key", "file_name", "content_type", "file_size", "uploaded_at"],
   admin_sessions: ["id", "admin_id", "token_hash", "expires_at"],
+  guest_sessions: ["id", "event_id", "token_hash", "expires_at"],
   login_attempts: ["id", "ip_hash", "email_hash", "attempted_at", "success"],
-  photo_delivery_meta: ["photo_id", "secure_url", "resource_type", "width", "height", "format", "duration"]
+  photo_delivery_meta: ["photo_id", "secure_url", "resource_type", "width", "height", "format", "duration"],
+  crm_enquiries: ["id", "admin_id", "customer_name", "phone", "status", "created_at"],
+  crm_bookings: ["id", "admin_id", "customer_name", "phone", "total_amount", "status", "created_at"],
+  crm_payments: ["id", "admin_id", "booking_id", "amount", "payment_date"]
 };
 
 export async function onRequestGet({ env }) {

@@ -1,0 +1,27 @@
+name: RP CRM and website checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - feature/rp-crm-d1-integration
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check JavaScript syntax
+        run: npm run check
+      - name: Run automated tests
+        run: npm test
+      - name: Verify additive D1 migrations preserve existing data
+        run: python3 tests/test_migrations.py

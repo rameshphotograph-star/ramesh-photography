@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Ramesh Photography customer enquiries, bookings and payment CRM.">
+<title>RP CRM | Ramesh Photography</title>
+<style>
+:root{font-family:Inter,system-ui,-apple-system,sans-serif;color:#172033;background:#f3f5f9}*{box-sizing:border-box}body{margin:0}.top{background:#101a2c;color:white;padding:24px max(20px,calc((100% - 1100px)/2))}.top a{color:#dbe4f5;text-decoration:none}.top h1{margin:0;font-size:26px}.top p{margin:6px 0 0;color:#b8c3d6}.wrap{max-width:1100px;margin:24px auto;padding:0 16px}.notice{background:#fff5dd;border:1px solid #f0dfb5;padding:13px 16px;border-radius:14px;margin-bottom:18px;color:#71531b}.nav,.stats,.grid{display:grid;gap:12px}.nav{grid-template-columns:repeat(4,1fr);margin-bottom:16px}.nav button,button{border:0;border-radius:12px;padding:12px 16px;background:#111c30;color:white;font:inherit;font-weight:600;cursor:pointer}.nav button{background:white;color:#172033;border:1px solid #dce1e9}.nav button.active{background:#111c30;color:white}.stats{grid-template-columns:repeat(4,1fr);margin-bottom:16px}.card,.panel{background:white;border:1px solid #e1e5ec;border-radius:18px;padding:18px}.stat small{display:block;color:#697589}.stat strong{font-size:28px;display:block;margin-top:6px}.panel{margin-bottom:16px}.panel h2{margin:0 0 14px;font-size:20px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}.field label{font-size:13px;color:#536075;font-weight:600}.field input,.field select,.field textarea{width:100%;padding:12px;border:1px solid #d6dce6;border-radius:10px;font:inherit;background:white}.field textarea{min-height:76px}.form-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.secondary{background:#eef1f6;color:#172033}.hidden{display:none!important}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:11px 9px;border-bottom:1px solid #edf0f4;white-space:nowrap}th{color:#647086;font-size:12px}.muted{color:#6b7688}.msg{margin:10px 0;color:#136c45}.error{color:#b42318}.empty{text-align:center;color:#7a8493;padding:25px}@media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}.nav{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.wrap{margin:16px auto}.top{padding:20px}}
+</style>
+<script src="crm.js" defer></script>
+</head>
+<body>
+<header class="top"><h1>Ramesh Photography · RP CRM</h1><p>Customer enquiries · Bookings · Payments</p><p><a href="/admin.html">← Admin dashboard</a></p></header>
+<main class="wrap">
+<div class="notice">Private owner workspace. Sign in through the approved Admin account first. Records are stored in Cloudflare D1 once the CRM migration is applied.</div>
+<div id="message" class="msg" role="status"></div>
+<nav class="nav" aria-label="CRM sections"><button class="active" data-view="overview">Overview</button><button data-view="enquiries">Enquiries</button><button data-view="bookings">Bookings</button><button data-view="payments">Payments</button></nav>
+<section id="overview" class="view">
+<div class="stats">
+<div class="card stat"><small>Total enquiries</small><strong id="statEnquiries">—</strong></div>
+<div class="card stat"><small>Bookings</small><strong id="statBookings">—</strong></div>
+<div class="card stat"><small>Received</small><strong id="statReceived">—</strong></div>
+<div class="card stat"><small>Balance</small><strong id="statBalance">—</strong></div>
+</div>
+<div class="panel"><h2>Recent enquiries</h2><div id="recentEnquiries" class="table-wrap"></div></div>
+<div class="panel"><h2>Upcoming bookings</h2><div id="upcomingBookings" class="table-wrap"></div></div>
+</section>
+<section id="enquiries" class="view hidden">
+<div class="panel"><h2>Add customer enquiry</h2>
+<form id="enquiryForm">
+<div class="grid">
+<div class="field"><label for="enqName">Customer name *</label><input id="enqName" required maxlength="120"></div>
+<div class="field"><label for="enqPhone">Phone *</label><input id="enqPhone" required maxlength="30" inputmode="tel"></div>
+<div class="field"><label for="enqEmail">Email</label><input id="enqEmail" type="email"></div>
+<div class="field"><label for="enqType">Event type</label><select id="enqType"><option>wedding</option><option>haldi</option><option>reception</option><option>birthday</option><option>other</option></select></div>
+<div class="field"><label for="enqDate">Event date</label><input id="enqDate" type="date"></div>
+<div class="field"><label for="enqVenue">Venue</label><input id="enqVenue" maxlength="180"></div>
+<div class="field"><label for="enqPackage">Package</label><input id="enqPackage" maxlength="120"></div>
+<div class="field"><label for="enqQuote">Quoted amount (₹)</label><input id="enqQuote" type="number" min="0" step="0.01" value="0"></div>
+</div>
+<div class="field"><label for="enqNotes">Notes / follow-up</label><textarea id="enqNotes" maxlength="2000"></textarea></div>
+<div class="form-actions"><button type="submit">Save enquiry</button></div>
+</form></div>
+<div class="panel"><h2>Enquiry register</h2><div id="enquiryTable" class="table-wrap"></div></div>
+</section>
+<section id="bookings" class="view hidden">
+<div class="panel"><h2>Create booking</h2>
+<form id="bookingForm">
+<div class="grid">
+<div class="field"><label for="bookName">Customer name *</label><input id="bookName" required maxlength="120"></div>
+<div class="field"><label for="bookPhone">Phone *</label><input id="bookPhone" required maxlength="30" inputmode="tel"></div>
+<div class="field"><label for="bookEmail">Email</label><input id="bookEmail" type="email"></div>
+<div class="field"><label for="bookEnquiry">Convert enquiry (optional)</label><select id="bookEnquiry"><option value="">New booking</option></select></div>
+<div class="field"><label for="bookType">Event type</label><select id="bookType"><option>wedding</option><option>haldi</option><option>reception</option><option>birthday</option><option>other</option></select></div>
+<div class="field"><label for="bookDate">Event date</label><input id="bookDate" type="date"></div>
+<div class="field"><label for="bookVenue">Venue</label><input id="bookVenue" maxlength="180"></div>
+<div class="field"><label for="bookPackage">Package</label><input id="bookPackage" maxlength="120"></div>
+<div class="field"><label for="bookTotal">Total amount (₹) *</label><input id="bookTotal" type="number" min="0" step="0.01" required></div>
+<div class="field"><label for="bookAdvance">Advance received (₹)</label><input id="bookAdvance" type="number" min="0" step="0.01" value="0"></div>
+</div>
+<div class="field"><label for="bookNotes">Notes</label><textarea id="bookNotes" maxlength="2000"></textarea></div>
+<div class="form-actions"><button type="submit">Save booking</button></div>
+</form></div>
+<div class="panel"><h2>Booking register</h2><div id="bookingTable" class="table-wrap"></div></div>
+</section>
+<section id="payments" class="view hidden">
+<div class="panel"><h2>Record payment</h2>
+<form id="paymentForm">
+<div class="grid">
+<div class="field"><label for="paymentBooking">Booking *</label><select id="paymentBooking" required><option value="">Select booking</option></select></div>
+<div class="field"><label for="paymentAmount">Amount (₹) *</label><input id="paymentAmount" type="number" min="0.01" step="0.01" required></div>
+<div class="field"><label for="paymentMethod">Method</label><select id="paymentMethod"><option>cash</option><option>UPI</option><option>bank transfer</option><option>card</option><option>other</option></select></div>
+<div class="field"><label for="paymentRef">Reference / UTR</label><input id="paymentRef" maxlength="120"></div>
+</div>
+<div class="field"><label for="paymentNotes">Notes</label><textarea id="paymentNotes" maxlength="2000"></textarea></div>
+<div class="form-actions"><button type="submit">Save payment</button></div>
+</form></div>
+<div class="panel"><h2>Payment history</h2><div id="paymentTable" class="table-wrap"></div></div>
+</section>
+</main>
+</body></html>

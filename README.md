@@ -68,6 +68,20 @@ Set these separately in Pages → Settings → Preview → Variables and secrets
 
 Use the same Cloudinary account credentials only if you intend to store Preview test files in that Cloudinary account. Preview uploads will be written under ramesh-photography-preview/<event-code>, separated from the Production ramesh-photography/<event-code> folders.
 
+## RP CRM database foundation
+
+The first owner-facing UI is available at `/crm.html` after Admin sign-in. The Admin dashboard links to it. Its authenticated API is `/api/admin/crm/summary`, `/enquiries`, `/bookings`, and `/payments`; every request uses the existing Admin session and owner-scoped D1 queries. Booking advances are recorded as payment rows, and later payments are rejected if they exceed the remaining booking balance. Cancelled bookings are excluded from financial summary totals.
+
+
+The separate RP CRM module uses the same Cloudflare D1 database as the event-delivery website, but its records are stored in additive `crm_*` tables. The first migration is `migrations/0005_rp_crm.sql` and creates:
+- `crm_enquiries` for customer enquiries, follow-ups, quotations and lead status
+- `crm_bookings` for confirmed/tentative photography bookings and event details
+- `crm_payments` for booking payment entries and balance calculations
+
+This migration does not drop, rename, or rewrite the existing website tables. Apply it only after confirming a current D1 backup, first against the Preview database. Do not apply it to Production until the CRM routes/UI have been reviewed and Preview-tested.
+
+Admin OAuth now additionally requires the verified primary email on the allowlisted GitHub account to match `rameshphotograph@gmail.com`. The immutable GitHub user ID allowlist remains in place; both checks must pass.
+
 ## Database support tables
 The admin bootstrap, login and authenticated admin-session paths safely ensure support schema when needed:
 - login_attempts (failed-login throttling by IP and normalized account identifier)
