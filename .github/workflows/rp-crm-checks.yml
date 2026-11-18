@@ -23,3 +23,5 @@ jobs:
         run: npm run check
       - name: Run automated tests
         run: npm test
+      - name: Verify additive D1 migrations preserve existing data
+        run: python3 tests/test_migrations.py
