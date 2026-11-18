@@ -97,8 +97,9 @@ export async function onRequestPost({ request, env, params }) {
       if (!Number.isFinite(total) || total < 0 || !Number.isFinite(advance) || advance < 0 || advance > total || !statuses.bookings.has(status)) return error("Check the booking amount, advance and status.");
       if (input.enquiryId && !enquiryId) return error("Invalid enquiry.");
       if (enquiryId) {
-        const enquiry = await env.DB.prepare("SELECT id FROM crm_enquiries WHERE id=? AND admin_id=?").bind(enquiryId,admin.id).first();
+        const enquiry = await env.DB.prepare("SELECT id,status FROM crm_enquiries WHERE id=? AND admin_id=?").bind(enquiryId,admin.id).first();
         if (!enquiry) return error("Enquiry not found.",404);
+        if (["converted","lost"].includes(enquiry.status)) return error("This enquiry is already closed and cannot be converted into another booking.",409);
       }
       const result = await env.DB.prepare(
         "INSERT INTO crm_bookings (admin_id,enquiry_id,customer_name,phone,email,event_type,event_date,venue,package_name,total_amount,advance_amount,status,notes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)"
