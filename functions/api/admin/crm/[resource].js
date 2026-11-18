@@ -27,7 +27,7 @@ export async function onRequestGet({ request, env, params }) {
       const [enquiries, bookings, payments] = await Promise.all([
         env.DB.prepare("SELECT COUNT(*) AS total, SUM(CASE WHEN status NOT IN ('converted','lost') THEN 1 ELSE 0 END) AS open FROM crm_enquiries WHERE admin_id=?").bind(admin.id).first(),
         env.DB.prepare("SELECT COUNT(*) AS total, COALESCE(SUM(total_amount),0) AS value FROM crm_bookings WHERE admin_id=? AND status!='cancelled'").bind(admin.id).first(),
-        env.DB.prepare("SELECT COALESCE(SUM(amount),0) AS received FROM crm_payments WHERE admin_id=?").bind(admin.id).first()
+        env.DB.prepare("SELECT COALESCE(SUM(p.amount),0) AS received FROM crm_payments p JOIN crm_bookings b ON b.id=p.booking_id AND b.admin_id=p.admin_id WHERE p.admin_id=? AND b.status!='cancelled'").bind(admin.id).first()
       ]);
       const received = money(payments?.received || 0);
       const booked = money(bookings?.value || 0);
