@@ -16,6 +16,6 @@ export async function onRequestPost({request,env}){
  await env.DB.prepare("DELETE FROM crm_login_attempts WHERE ip_hash=?").bind(ipHash).run();
  const token=randomToken(),tokenHash=await sha256(token),sessionId=crypto.randomUUID();
  await env.DB.prepare("DELETE FROM crm_sessions WHERE expires_at<=CURRENT_TIMESTAMP").run();
- await env.DB.prepare("INSERT INTO crm_sessions(id,user_id,token_hash,expires_at) VALUES(?,?,?,datetime('now','+12 hours'))").bind(sessionId,row.id,tokenHash).run();
+ await env.DB.prepare("INSERT INTO crm_sessions(id,user_id,token_hash,expires_at,last_seen_at) VALUES(?,?,?,datetime('now','+12 hours'),CURRENT_TIMESTAMP)").bind(sessionId,row.id,tokenHash).run();
  return json({success:true,user:{id:row.id,email:row.email,name:row.display_name}},200,{"set-cookie":cookie(token)});
 }
