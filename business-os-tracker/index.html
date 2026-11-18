@@ -15,6 +15,7 @@
 <div class="card metric"><small>Total debt (starting)</small><strong id="debtMetric">₹9,00,000</strong></div>
 <div class="card metric"><small>This month's collections</small><strong id="collectionMetric">₹0</strong></div>
 <div class="card metric"><small>This month's business costs</small><strong id="costMetric">₹0</strong></div>
+<div class="card metric"><small>Pending client balances</small><strong id="pendingMetric">₹0</strong></div>
 <div class="card metric"><small>Reserve balance</small><strong id="reserveMetric">₹0</strong></div>
 </div>
 <div class="row" style="margin-top:12px">
@@ -54,9 +55,9 @@ document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()
 function render(){
 const month=new Date().toISOString().slice(0,7), rows=data.records.filter(r=>r.date?.startsWith(month));
 const sum=t=>rows.filter(r=>r.type===t).reduce((a,r)=>a+Number(r.amount),0);
-el('collectionMetric').textContent=money(sum('collection'));el('costMetric').textContent=money(sum('expense'));
+el('collectionMetric').textContent=money(sum('collection'));el('costMetric').textContent=money(sum('expense'));el('pendingMetric').textContent=money(data.records.filter(r=>r.type==='pending').reduce((a,r)=>a+Number(r.amount),0));
 el('reserveMetric').textContent=money(data.records.filter(r=>r.type==='reserve').reduce((a,r)=>a+Number(r.amount),0)-data.records.filter(r=>r.type==='reserveout').reduce((a,r)=>a+Number(r.amount),0));
-const paid=data.debtPayments.reduce((a,r)=>a+Number(r.amount),0);el('debtMetric').textContent=money(Math.max(0,900000-paid));
+const paid=data.debtPayments.reduce((a,r)=>a+Number(r.amount),0)+data.records.filter(r=>r.type==='debtpay').reduce((a,r)=>a+Number(r.amount),0);el('debtMetric').textContent=money(Math.max(0,900000-paid));
 el('recent').innerHTML=data.records.length?data.records.slice(-8).reverse().map(r=>'<div class="item"><strong>'+esc(r.note||r.type)+'</strong><span class="muted">'+esc(r.date)+' · '+esc(r.type)+'</span><b>'+money(r.amount)+'</b></div>').join(''):'<p class="muted">No records yet.</p>';
 el('tasks').innerHTML=data.tasks.map((t,i)=>'<div class="item"><label><input type="checkbox" data-task="'+i+'" '+(t.done?'checked':'')+' style="width:auto;margin-right:8px">'+esc(t.text)+'</label></div>').join('');
 el('debtPayments').innerHTML=data.debtPayments.map(r=>'<div class="item">'+esc(r.lender)+' · '+esc(r.date)+' <b>'+money(r.amount)+'</b></div>').join('');
