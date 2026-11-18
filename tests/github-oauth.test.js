@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   ALLOWED_GITHUB_USER_ID,
+  ALLOWED_OWNER_EMAIL,
   GITHUB_CALLBACK_PATH,
   githubOAuthConfigured,
   githubOAuthStarted,
@@ -16,6 +17,7 @@ import {
 
 test("only the explicitly allowlisted GitHub identity is accepted", () => {
   assert.equal(ALLOWED_GITHUB_USER_ID, "340888996");
+  assert.equal(ALLOWED_OWNER_EMAIL, "rameshphotograph@gmail.com");
   assert.equal(isAllowedGithubIdentity({ id: 340888996, login: "rameshphotograph-star" }), true);
   assert.equal(isAllowedGithubIdentity({ id: 123456, login: "someone-else" }), false);
   assert.equal(isAllowedGithubIdentity({ login: "rameshphotograph-star" }), false);
