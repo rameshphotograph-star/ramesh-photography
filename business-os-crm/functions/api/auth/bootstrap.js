@@ -7,10 +7,17 @@ export async function onRequestPost({request,env}){
  if(email!=="rameshphotograph@gmail.com")return json({error:"This email is not allowed"},403);
  if(setupKey.trim()!==String(env.OWNER_SETUP_KEY).trim())return json({error:"Invalid setup key"},403);
  if(password.length<14)return json({error:"Use a password with at least 14 characters"},400);
- const exists=await env.DB.prepare("SELECT id FROM crm_users WHERE lower(email)=lower(?) LIMIT 1").bind(email).first();
- if(exists)return json({error:"Owner account already exists. Please sign in."},409);
- const id=crypto.randomUUID(),salt=randomToken(),hash=await passwordHash(password,salt);
- await env.DB.prepare("INSERT INTO crm_users(id,email,display_name,role,is_active) VALUES(?,?,?,'owner',1)").bind(id,email,name||"Ramesh Photography Owner").run();
- await env.DB.prepare("INSERT INTO crm_user_credentials(user_id,password_salt,password_hash) VALUES(?,?,?)").bind(id,salt,hash).run();
- return json({success:true,message:"Owner account created. Please sign in."},201);
+ try {
+  const exists=await env.DB.prepare("SELECT id FROM crm_users WHERE lower(email)=lower(?) LIMIT 1").bind(email).first();
+  if(exists)return json({error:"Owner account already exists. Please sign in."},409);
+  const id=crypto.randomUUID(),salt=randomToken(),hash=await passwordHash(password,salt);
+  await env.DB.batch([
+   env.DB.prepare("INSERT INTO crm_users(id,email,display_name,role,is_active) VALUES(?,?,?,'owner',1)").bind(id,email,name||"Ramesh Photography Owner"),
+   env.DB.prepare("INSERT INTO crm_user_credentials(user_id,password_salt,password_hash) VALUES(?,?,?)").bind(id,salt,hash)
+  ]);
+  return json({success:true,message:"Owner account created. Please sign in."},201);
+ } catch (error) {
+  console.error("Owner bootstrap failed", error);
+  return json({error:"Owner setup failed on the server. Check D1 auth tables and Pages configuration."},500);
+ }
 }
